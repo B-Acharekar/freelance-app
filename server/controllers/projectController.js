@@ -45,3 +45,15 @@ export const getProjectById = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch project', error });
   }
 };
+
+export const getMyPostedProjects = async (req, res) => {
+  try {
+    const clientId = req.user.id;
+
+    const projects = await Project.find({ clientId }); // assuming clientId field exists
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error('Error fetching posted projects:', error);
+    res.status(500).json({ message: 'Failed to fetch your posted projects' });
+  }
+};

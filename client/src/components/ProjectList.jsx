@@ -9,7 +9,7 @@ const ProjectList = () => {
     const fetchProjects = async () => {
       try {
         const res = await fetchAllProjects();
-        setProjects(res.data);  // res.data should be array of projects
+        setProjects(res.data);
       } catch (error) {
         console.error('Failed to fetch projects:', error);
       }
@@ -19,13 +19,19 @@ const ProjectList = () => {
   }, []);
 
   if (!projects.length) {
-    return <p className="text-center text-gray-600">No projects available right now.</p>;
+    return (
+      <p className="text-center text-muted fs-5 mt-4">
+        😕 No projects available at the moment.
+      </p>
+    );
   }
 
   return (
-    <div className="grid gap-4">
+    <div className="row g-4">
       {projects.map((project) => (
-        <ProjectCard key={project._id} project={project} />
+        <div key={project._id} className="col-md-6">
+          <ProjectCard project={project} />
+        </div>
       ))}
     </div>
   );

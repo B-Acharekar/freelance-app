@@ -1,19 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ProjectForm from '../components/ProjectForm';
+import { Container, Card, Alert } from 'react-bootstrap';
 
 const PostProject = () => {
   const { user } = useAuth();
+  const [success, setSuccess] = useState(false);
 
   if (!user || user.role !== 'client') {
-    return <div className="text-red-600 text-center mt-10">Access Denied – Only clients can post projects.</div>;
+    return (
+      <Container className="mt-5">
+        <Alert variant="danger" className="text-center">
+          Access Denied – Only clients can post projects.
+        </Alert>
+      </Container>
+    );
   }
 
   return (
-    <div className="container mx-auto mt-6">
-      <h2 className="text-2xl font-bold mb-4">Post a New Project</h2>
-      <ProjectForm onSuccess={() => alert('Project posted successfully!')} />
-    </div>
+    <Container className="mt-5">
+      <Card className="shadow-sm p-4">
+        <h2 className="mb-4 text-center text-primary">Post a New Project</h2>
+
+        {success && (
+          <Alert variant="success" onClose={() => setSuccess(false)} dismissible>
+            Project posted successfully!
+          </Alert>
+        )}
+
+        <ProjectForm onSuccess={() => setSuccess(true)} />
+      </Card>
+    </Container>
   );
 };
 

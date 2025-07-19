@@ -1,14 +1,51 @@
-// src/components/ProjectCard.jsx
 import React from 'react';
+import { FaMoneyBillWave, FaTools, FaUserTie } from 'react-icons/fa';
+import { NavLink } from 'react-router-dom';
 
-const ProjectCard = ({ project }) => {
+const ProjectCard = ({ project, role }) => {
+  const { title, description, budget, skillsRequired, clientId, _id } = project;
+
   return (
-    <div className="border rounded-xl p-4 shadow-md mb-4">
-      <h3 className="text-xl font-bold">{project.title}</h3>
-      <p className="text-gray-600">{project.description}</p>
-      <p className="mt-2 text-sm text-blue-600 font-medium">💰 Budget: ₹{project.budget}</p>
-      <p className="text-sm mt-1">🔧 Skills: {project.skillsRequired.join(', ')}</p>
-      <p className="text-xs mt-1 text-gray-500">Posted by: {project.clientId?.name} ({project.clientId?.email})</p>
+    <div className="card shadow-sm h-100 border-0 rounded-4 mb-4">
+      <div className="card-body">
+        <h5 className="card-title fw-bold text-dark">{title}</h5>
+        <p className="card-text text-muted">{description}</p>
+
+        <ul className="list-unstyled mt-3 mb-0">
+          <li className="mb-2">
+            <FaMoneyBillWave className="me-2 text-success" />
+            <strong>Budget:</strong> ₹{budget}
+          </li>
+          <li className="mb-2">
+            <FaTools className="me-2 text-primary" />
+            <strong>Skills:</strong> {skillsRequired?.join(', ')}
+          </li>
+          <li className="text-muted small">
+            <FaUserTie className="me-2" />
+            <strong>Posted by:</strong> {clientId?.name} ({clientId?.email})
+          </li>
+        </ul>
+
+        {/* Role-based action buttons */}
+        <div className="mt-4 d-flex justify-content-end">
+          {role === 'freelancer' && (
+            <NavLink
+              to={`/applications/apply/${_id}`}
+              className="btn btn-sm btn-outline-success rounded-pill"
+            >
+              Apply Now
+            </NavLink>
+          )}
+          {role === 'client' && (
+            <NavLink
+              to={`/applications/project/${_id}`}
+              className="btn btn-sm btn-outline-primary rounded-pill"
+            >
+              View Applicants
+            </NavLink>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

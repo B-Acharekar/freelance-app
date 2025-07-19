@@ -1,0 +1,37 @@
+.home-hero {
+  min-height: 100vh;
+  position: relative;
+  background-image: url("https://images.unsplash.com/photo-1744555270794-6d378b9e7cd3?q=80&w=1380&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  background-clip: text;                 
+  -webkit-background-clip: text;         
+  -webkit-text-fill-color: transparent; 
+  color: transparent;                    
+}
+
+
+/* Gradient button */
+.btn-gradient {
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  opacity: 0.9;
+  transform: scale(1.03);
+}

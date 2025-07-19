@@ -58,8 +58,47 @@ export const getMyApplications = async (req, res) => {
 
     const applications = await Application.find({
       freelancerId: req.user.id,
-    }).populate("projectId");
-    res.json(applications);
+    }).populate("projectId", "title description");
+
+    // Format response with status and essential details
+    const formatted = applications.map((app) => ({
+      _id: app._id,
+      projectTitle: app.projectId?.title,
+      projectDescription: app.projectId?.description,
+      bidAmount: app.bidAmount,
+      coverLetter: app.coverLetter,
+      portfolioLink: app.portfolioLink,
+      status: app.status, // 👈 Include status
+      createdAt: app.createdAt,
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const updateApplicationStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+
+    if (!["accepted", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const application = await Application.findById(id).populate("projectId");
+    if (!application) return res.status(404).json({ message: "Not found" });
+
+    // Only client who owns the project can update status
+    if (application.projectId.clientId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    application.status = status;
+    await application.save();
+
+    res.json({ message: `Application ${status}` });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

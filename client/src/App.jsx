@@ -3,24 +3,88 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import Navbar from './components/Navbar';
+import CustomNavbar from './components/CustomNavbar';
 import PostProject from './pages/PostProject';
 import BrowseProjects from './pages/BrowseProjects';
+import MyApplications from "./pages/MyApplications";
+import ApplyForProjectWrapper from "./pages/ApplyForProjectWrapper";
+import ApplicationsByProjectWrapper from "./pages/ApplicationsByProjectWrapper";
 import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from "./components/ProjectedRoute";
+import PostedProjects from './pages/PostedProjects';
+import Footer from "./components/Footer";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
+        <CustomNavbar />
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/projects/post" element={<PostProject />} />
-          <Route path="/projects/browse" element={<BrowseProjects />} />
+
+          {/* Protected routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/projects/post"
+            element={
+              <ProtectedRoute allowedRoles={['client']}>
+                <PostProject />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/projects/browse"
+            element={
+              <ProtectedRoute allowedRoles={['client', 'freelancer']}>
+                <BrowseProjects />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/applications/my"
+            element={
+              <ProtectedRoute allowedRoles={['freelancer']}>
+                <MyApplications />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/applications/apply/:projectId"
+            element={
+              <ProtectedRoute allowedRoles={['freelancer']}>
+                <ApplyForProjectWrapper />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/applications/project/:projectId"
+            element={
+              <ProtectedRoute allowedRoles={['client']}>
+                <ApplicationsByProjectWrapper />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/my-projects"
+            element={
+              <ProtectedRoute allowedRoles={['client']}>
+                <PostedProjects />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
+      <Footer />
       </Router>
     </AuthProvider>
   );

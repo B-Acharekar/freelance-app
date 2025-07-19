@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import { registerUser } from "../services/auth";
 import { useNavigate } from "react-router-dom";
+import { FaUserPlus, FaUserTie, FaUserGraduate } from "react-icons/fa";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -42,28 +43,49 @@ const Register = () => {
   };
 
   return (
-    <Container fluid className="vh-100 p-0">
+    <Container
+      fluid
+      className="vh-100 p-0 position-relative"
+      style={{ fontFamily: "'Poppins', sans-serif" }}
+    >
+      {/* Floating Icons Background */}
+      <div
+        style={{
+          position: "absolute",
+          top: "25%",
+          left: "10%",
+          fontSize: "5rem",
+          color: "rgba(255, 255, 255, 0.05)",
+          zIndex: 0,
+          display: "flex",
+          gap: "2rem",
+        }}
+      >
+        <FaUserPlus />
+        <FaUserTie />
+        <FaUserGraduate />
+      </div>
+
       <Row className="h-100 g-0">
         {/* Left Panel */}
         <Col
           md={6}
-          className="d-flex flex-column justify-content-center align-items-center text-white p-5"
+          className="d-none d-md-flex flex-column justify-content-center align-items-center text-white"
           style={{
-            background: "linear-gradient(to right, #6a11cb, #2575fc)",
-            fontFamily: "'Segoe UI', sans-serif",
+            background: "linear-gradient(135deg, #6a11cb, #2575fc)",
+            padding: "4rem",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <h1 style={{ fontSize: "3rem", fontWeight: "bold" }}>SB Works</h1>
+          <h1 style={{ fontSize: "3rem", fontWeight: "700", zIndex: 1 }}>
+            SB Works
+          </h1>
           <p
-            className="text-center mt-4"
-            style={{
-              fontSize: "1.5rem",
-              maxWidth: "500px",
-              fontStyle: "italic",
-              opacity: 0.95,
-            }}
+            className="mt-3 text-center"
+            style={{ fontSize: "1.5rem", zIndex: 1, maxWidth: "500px" }}
           >
-            “Do what you love, and you’ll never work a day in your life.”
+            Create your profile and let the world know your skills.
           </p>
         </Col>
 
@@ -71,92 +93,102 @@ const Register = () => {
         <Col
           md={6}
           className="d-flex justify-content-center align-items-center"
-          style={{ backgroundColor: "#f9f9f9" }}
+          style={{ backgroundColor: "#f4f8fb" }}
         >
           <div
-            className="p-4 shadow-lg rounded-4 w-100"
+            className="p-5 rounded-5 shadow-lg w-100 animate__animated animate__fadeIn"
             style={{
-              maxWidth: "450px",
-              background: "rgba(255, 255, 255, 0.95)",
-              border: "1px solid #e0e0e0",
-              backdropFilter: "blur(10px)",
+              maxWidth: "460px",
+              background: "rgba(255, 255, 255, 0.85)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid #e3f2fd",
+              zIndex: 1,
             }}
           >
-            <h3 className="text-center mb-4 fw-bold">Create an Account</h3>
+            <h2
+              className="text-center mb-4"
+              style={{ fontWeight: 600, color: "#6a11cb" }}
+            >
+              Create an Account
+            </h2>
 
-            {/* Role toggle */}
-            <Form.Group className="mb-4 text-center">
-              <ButtonGroup>
-                {["client", "freelancer"].map((role) => (
-                  <ToggleButton
-                    key={role}
-                    id={`radio-${role}`}
-                    type="radio"
-                    variant={
-                      form.role === role ? "primary" : "outline-primary"
-                    }
-                    name="role"
-                    value={role}
-                    checked={form.role === role}
-                    onChange={(e) =>
-                      setForm({ ...form, role: e.currentTarget.value })
-                    }
-                    className="mx-2 rounded-pill px-4 fw-semibold"
-                  >
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </ToggleButton>
-                ))}
-              </ButtonGroup>
-            </Form.Group>
+            {/* Toggle Role */}
+            <ButtonGroup className="mb-4 w-100 d-flex justify-content-center">
+              {["client", "freelancer"].map((role) => (
+                <ToggleButton
+                  key={role}
+                  id={`radio-${role}`}
+                  type="radio"
+                  name="role"
+                  value={role}
+                  checked={form.role === role}
+                  onChange={(e) =>
+                    setForm({ ...form, role: e.currentTarget.value })
+                  }
+                  className="mx-2 rounded-pill fw-semibold shadow-sm"
+                  style={{
+                    minWidth: "130px",
+                    backgroundColor: form.role === role ? "#6a11cb" : "#fff",
+                    borderColor: "#b39ddb",
+                    color: form.role === role ? "#fff" : "#6a11cb",
+                    transition: "all 0.3s ease-in-out",
+                  }}
+                >
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
 
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3">
-                <Form.Label>Full Name</Form.Label>
+            {/* Form */}
+            <Form onSubmit={handleSubmit} noValidate>
+              <Form.Group className="mb-3" controlId="name">
+                <Form.Label className="fw-semibold">Full Name</Form.Label>
                 <Form.Control
                   type="text"
-                  required
                   placeholder="John Doe"
                   value={form.name}
                   onChange={(e) =>
                     setForm({ ...form, name: e.target.value })
                   }
-                  className="rounded-3"
+                  className="rounded-4 shadow-sm"
+                  required
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Email address</Form.Label>
+              <Form.Group className="mb-3" controlId="email">
+                <Form.Label className="fw-semibold">Email</Form.Label>
                 <Form.Control
                   type="email"
-                  required
-                  placeholder="john@example.com"
+                  placeholder="e.g. john@example.com"
                   value={form.email}
                   onChange={(e) =>
                     setForm({ ...form, email: e.target.value })
                   }
-                  className="rounded-3"
+                  className="rounded-4 shadow-sm"
+                  required
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Password</Form.Label>
+              <Form.Group className="mb-3" controlId="password">
+                <Form.Label className="fw-semibold">Password</Form.Label>
                 <Form.Control
                   type="password"
-                  required
                   placeholder="Enter password"
                   value={form.password}
                   onChange={(e) =>
                     setForm({ ...form, password: e.target.value })
                   }
-                  className="rounded-3"
+                  className="rounded-4 shadow-sm"
+                  required
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Confirm Password</Form.Label>
+              <Form.Group className="mb-3" controlId="confirmPassword">
+                <Form.Label className="fw-semibold">
+                  Confirm Password
+                </Form.Label>
                 <Form.Control
                   type="password"
-                  required
                   placeholder="Re-enter password"
                   value={form.confirmPassword}
                   onChange={(e) =>
@@ -165,7 +197,8 @@ const Register = () => {
                       confirmPassword: e.target.value,
                     })
                   }
-                  className="rounded-3"
+                  className="rounded-4 shadow-sm"
+                  required
                 />
               </Form.Group>
 
@@ -176,7 +209,13 @@ const Register = () => {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-100 mt-2 fw-bold rounded-3"
+                className="w-100 py-2 mt-2 rounded-4 fw-bold"
+                style={{
+                  background: "#6a11cb",
+                  border: "none",
+                  fontSize: "1.1rem",
+                  letterSpacing: "0.5px",
+                }}
               >
                 Register
               </Button>

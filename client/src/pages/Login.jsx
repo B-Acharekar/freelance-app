@@ -7,13 +7,18 @@ import {
   Col,
   ToggleButton,
   ButtonGroup,
-  ProgressBar,
   InputGroup,
 } from "react-bootstrap";
 import { loginUser } from "../services/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaUserShield,
+  FaUserTie,
+  FaUserAstronaut,
+} from "react-icons/fa";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,7 +32,6 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -44,6 +48,7 @@ const Login = () => {
     try {
       const res = await loginUser(form);
       login(res.data.user, res.data.token);
+      localStorage.setItem("token", res.data.token);
       navigate("/dashboard");
     } catch (err) {
       setError("Login failed. Check your credentials.");
@@ -53,91 +58,95 @@ const Login = () => {
   };
 
   return (
-    <Container fluid className="vh-100 overflow-hidden">
-      <Row className="h-100">
-        {/* Left Panel with animated quote */}
+    <Container
+      fluid
+      className="vh-100 p-0 position-relative"
+      style={{ fontFamily: "'Poppins', sans-serif" }}
+    >
+      {/* Floating Icons */}
+      <div
+        style={{
+          position: "absolute",
+          top: "25%",
+          left: "10%",
+          fontSize: "5rem",
+          color: "rgba(255, 255, 255, 0.05)",
+          zIndex: 0,
+          display: "flex",
+          gap: "2rem",
+        }}
+      >
+        <FaUserShield />
+        <FaUserTie />
+        <FaUserAstronaut />
+      </div>
+
+      <Row className="h-100 g-0">
+        {/* Left Panel */}
         <Col
           md={6}
-          className="d-flex flex-column p-5"
+          className="d-none d-md-flex flex-column justify-content-center align-items-center text-white"
           style={{
             background: "linear-gradient(135deg, #6a11cb, #2575fc)",
-            color: "#fff",
-            fontFamily: "'Playfair Display', serif",
+            padding: "4rem",
             position: "relative",
             overflow: "hidden",
           }}
         >
-          <div className="d-flex flex-grow-1 justify-content-center align-items-center px-3">
-            <blockquote
-              className="text-center animate__animated animate__fadeInUp"
-              style={{
-                fontSize: "2.6rem",
-                fontStyle: "italic",
-                fontWeight: "600",
-                lineHeight: "1.4",
-                maxWidth: "600px",
-                userSelect: "none",
-                color: "#e3f2fd",
-                textShadow: "1px 2px 10px rgba(0,0,0,0.3)",
-                animationDelay: "0.5s",
-              }}
-            >
-              “Where <span style={{ color: "#fff176" }}>passion</span> meets{" "}
-              <span style={{ color: "#ffd54f" }}>opportunity</span>.”
-            </blockquote>
-          </div>
+          <h1 style={{ fontSize: "3rem", fontWeight: "700", zIndex: 1 }}>
+            SB Works
+          </h1>
+          <p
+            className="mt-3 text-center"
+            style={{ fontSize: "1.5rem", zIndex: 1, maxWidth: "500px" }}
+          >
+            Where <strong>passion</strong> meets <strong>opportunity</strong>.
+          </p>
         </Col>
 
-        {/* Right Panel with glassmorphism form */}
+        {/* Right Panel */}
         <Col
           md={6}
-          className="d-flex justify-content-center align-items-center p-4"
-          style={{
-            background: "#f1f2f6",
-          }}
+          className="d-flex justify-content-center align-items-center"
+          style={{ backgroundColor: "#f4f8fb" }}
         >
           <div
-            className="glass-card p-5 rounded-5 shadow-lg w-100 animate__animated animate__fadeIn"
+            className="p-5 rounded-5 shadow-lg w-100 animate__animated animate__fadeIn"
             style={{
-              maxWidth: "450px",
-              backdropFilter: "blur(20px)",
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-              border: "1px solid rgba(255, 255, 255, 0.4)",
-              boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.2)",
+              maxWidth: "460px",
+              background: "rgba(255, 255, 255, 0.85)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid #e3f2fd",
+              zIndex: 1,
             }}
           >
             <h2
               className="text-center mb-4"
-              style={{
-                fontFamily: "'Montserrat', sans-serif",
-                fontWeight: "700",
-              }}
+              style={{ fontWeight: 600, color: "#6a11cb" }}
             >
-              Login
+              Login to Your Account
             </h2>
 
-            {/* Role toggle */}
+            {/* Toggle Role */}
             <ButtonGroup className="mb-4 w-100 d-flex justify-content-center">
               {["client", "freelancer"].map((role) => (
                 <ToggleButton
                   key={role}
                   id={`radio-${role}`}
                   type="radio"
-                  variant={form.role === role ? "primary" : "outline-primary"}
                   name="role"
                   value={role}
                   checked={form.role === role}
                   onChange={(e) =>
                     setForm({ ...form, role: e.currentTarget.value })
                   }
-                  className="mx-2 rounded-pill fw-semibold"
+                  className="mx-2 rounded-pill fw-semibold shadow-sm"
                   style={{
                     minWidth: "130px",
-                    background:
-                      form.role === role
-                        ? "linear-gradient(45deg, #42a5f5, #478ed1)"
-                        : "transparent",
-                    borderColor: "#90caf9",
+                    backgroundColor: form.role === role ? "#6a11cb" : "#fff",
+                    borderColor: "#b39ddb",
+                    color: form.role === role ? "#fff" : "#6a11cb",
+                    transition: "all 0.3s ease-in-out",
                   }}
                 >
                   {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -148,10 +157,10 @@ const Login = () => {
             {/* Form */}
             <Form onSubmit={handleSubmit} noValidate>
               <Form.Group className="mb-3" controlId="email">
-                <Form.Label>Email</Form.Label>
+                <Form.Label className="fw-semibold">Email</Form.Label>
                 <Form.Control
-                  type="text"
-                  placeholder="e.g. john@workmail.com"
+                  type="email"
+                  placeholder="e.g. user@sbworks.com"
                   value={form.email}
                   onChange={(e) =>
                     setForm({ ...form, email: e.target.value })
@@ -165,11 +174,11 @@ const Login = () => {
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="password">
-                <Form.Label>Password</Form.Label>
+                <Form.Label className="fw-semibold">Password</Form.Label>
                 <InputGroup className="rounded-4 shadow-sm">
                   <Form.Control
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder="Enter password"
                     value={form.password}
                     onChange={(e) =>
                       setForm({ ...form, password: e.target.value })
@@ -178,13 +187,13 @@ const Login = () => {
                     className="rounded-start-4"
                   />
                   <InputGroup.Text
+                    onClick={() => setShowPassword(!showPassword)}
                     style={{
                       cursor: "pointer",
-                      backgroundColor: "#f5f5f5",
+                      backgroundColor: "#e3f2fd",
                       borderLeft: 0,
                       borderRadius: "0 12px 12px 0",
                     }}
-                    onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -204,13 +213,14 @@ const Login = () => {
                 variant="primary"
                 className="w-100 py-2 mt-2 rounded-4 fw-bold"
                 style={{
-                  background:
-                    "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+                  background: "#6a11cb",
                   border: "none",
+                  fontSize: "1.1rem",
+                  letterSpacing: "0.5px",
                 }}
                 disabled={loading}
               >
-                Login
+                {loading ? "Logging in..." : "Login"}
               </Button>
             </Form>
           </div>
