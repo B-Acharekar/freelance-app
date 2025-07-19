@@ -13,7 +13,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from "./components/ProjectedRoute";
 import PostedProjects from './pages/PostedProjects';
 import Footer from "./components/Footer";
-
+import ChatBox from "./pages/chatroom";
 function App() {
   return (
     <AuthProvider>
