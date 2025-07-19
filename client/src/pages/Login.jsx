@@ -21,7 +21,7 @@ const Login = () => {
 
   const [form, setForm] = useState({
     role: "client",
-    emailOrUsername: "",
+    email: "",
     password: "",
   });
 
@@ -35,7 +35,7 @@ const Login = () => {
     setError("");
     setLoading(true);
 
-    if (!form.emailOrUsername.trim() || !form.password.trim()) {
+    if (!form.email.trim() || !form.password.trim()) {
       setError("Please fill all fields");
       setLoading(false);
       return;
@@ -53,155 +53,167 @@ const Login = () => {
   };
 
   return (
-    <Container fluid className="vh-100">
+    <Container fluid className="vh-100 overflow-hidden">
       <Row className="h-100">
-        {/* Left Panel */}
+        {/* Left Panel with animated quote */}
         <Col
           md={6}
           className="d-flex flex-column p-5"
           style={{
-            background: "linear-gradient(135deg, #2196f3, #21cbf3)",
+            background: "linear-gradient(135deg, #6a11cb, #2575fc)",
             color: "#fff",
-            position: "relative",
             fontFamily: "'Playfair Display', serif",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              top: 20,
-              left: 20,
-              fontWeight: "700",
-              fontSize: "1.8rem",
-              color: "#eceff1",
-              fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-              userSelect: "none",
-            }}
-          >
-            SB Works
-          </div>
-
-          <div className="d-flex flex-grow-1 justify-content-center align-items-center">
+          <div className="d-flex flex-grow-1 justify-content-center align-items-center px-3">
             <blockquote
-              className="text-center"
+              className="text-center animate__animated animate__fadeInUp"
               style={{
-                fontSize: "2.5rem",
+                fontSize: "2.6rem",
                 fontStyle: "italic",
                 fontWeight: "600",
-                lineHeight: "1.3",
-                maxWidth: "500px",
+                lineHeight: "1.4",
+                maxWidth: "600px",
                 userSelect: "none",
+                color: "#e3f2fd",
+                textShadow: "1px 2px 10px rgba(0,0,0,0.3)",
+                animationDelay: "0.5s",
               }}
             >
-              “Where passion meets opportunity.”
+              “Where <span style={{ color: "#fff176" }}>passion</span> meets{" "}
+              <span style={{ color: "#ffd54f" }}>opportunity</span>.”
             </blockquote>
           </div>
         </Col>
 
-        {/* Right Panel */}
+        {/* Right Panel with glassmorphism form */}
         <Col
           md={6}
-          className="d-flex flex-column justify-content-center align-items-center p-5 bg-light"
+          className="d-flex justify-content-center align-items-center p-4"
           style={{
-            fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-            maxWidth: "500px",
-            margin: "auto",
+            background: "#f1f2f6",
           }}
         >
-          {loading && <ProgressBar animated now={100} className="w-100 mb-3" />}
-
-          <h2
-            className="mb-4 fw-semibold text-center"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
+          <div
+            className="glass-card p-5 rounded-5 shadow-lg w-100 animate__animated animate__fadeIn"
+            style={{
+              maxWidth: "450px",
+              backdropFilter: "blur(20px)",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              border: "1px solid rgba(255, 255, 255, 0.4)",
+              boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.2)",
+            }}
           >
-            Login
-          </h2>
+            <h2
+              className="text-center mb-4"
+              style={{
+                fontFamily: "'Montserrat', sans-serif",
+                fontWeight: "700",
+              }}
+            >
+              Login
+            </h2>
 
-          {/* Role toggle */}
-          <ButtonGroup className="mb-4 w-100 justify-content-center">
-            {["client", "freelancer"].map((role) => (
-              <ToggleButton
-                key={role}
-                id={`radio-${role}`}
-                type="radio"
-                variant={form.role === role ? "primary" : "outline-primary"}
-                name="role"
-                value={role}
-                checked={form.role === role}
-                onChange={(e) =>
-                  setForm({ ...form, role: e.currentTarget.value })
-                }
-                style={{ minWidth: "120px" }}
-              >
-                {role.charAt(0).toUpperCase() + role.slice(1)}
-              </ToggleButton>
-            ))}
-          </ButtonGroup>
-
-          <Form
-            onSubmit={handleSubmit}
-            noValidate
-            style={{ width: "100%", maxWidth: "400px", margin: "0 auto" }}
-          >
-            <Form.Group className="mb-3" controlId="emailOrUsername">
-              <Form.Label>Email or Username</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter email or username"
-                value={form.emailOrUsername}
-                onChange={(e) =>
-                  setForm({ ...form, emailOrUsername: e.target.value })
-                }
-                isInvalid={!!error && !form.emailOrUsername.trim()}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your email or username.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="password">
-              <Form.Label>Password</Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
-                  value={form.password}
+            {/* Role toggle */}
+            <ButtonGroup className="mb-4 w-100 d-flex justify-content-center">
+              {["client", "freelancer"].map((role) => (
+                <ToggleButton
+                  key={role}
+                  id={`radio-${role}`}
+                  type="radio"
+                  variant={form.role === role ? "primary" : "outline-primary"}
+                  name="role"
+                  value={role}
+                  checked={form.role === role}
                   onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
+                    setForm({ ...form, role: e.currentTarget.value })
                   }
-                  isInvalid={!!error && !form.password.trim()}
-                  required
-                />
-                <InputGroup.Text
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="mx-2 rounded-pill fw-semibold"
+                  style={{
+                    minWidth: "130px",
+                    background:
+                      form.role === role
+                        ? "linear-gradient(45deg, #42a5f5, #478ed1)"
+                        : "transparent",
+                    borderColor: "#90caf9",
+                  }}
                 >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </InputGroup.Text>
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
+
+            {/* Form */}
+            <Form onSubmit={handleSubmit} noValidate>
+              <Form.Group className="mb-3" controlId="email">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="e.g. john@workmail.com"
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm({ ...form, email: e.target.value })
+                  }
+                  isInvalid={!!error && !form.email.trim()}
+                  className="rounded-4 shadow-sm"
+                />
+                <Form.Control.Feedback type="invalid">
+                  Please enter your email.
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="mb-3" controlId="password">
+                <Form.Label>Password</Form.Label>
+                <InputGroup className="rounded-4 shadow-sm">
+                  <Form.Control
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
+                    }
+                    isInvalid={!!error && !form.password.trim()}
+                    className="rounded-start-4"
+                  />
+                  <InputGroup.Text
+                    style={{
+                      cursor: "pointer",
+                      backgroundColor: "#f5f5f5",
+                      borderLeft: 0,
+                      borderRadius: "0 12px 12px 0",
+                    }}
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </InputGroup.Text>
+                </InputGroup>
                 <Form.Control.Feedback type="invalid">
                   Please enter your password.
                 </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
+              </Form.Group>
 
-            {error && (
-              <div className="text-danger mb-3" style={{ userSelect: "none" }}>
-                {error}
-              </div>
-            )}
+              {error && (
+                <div className="text-danger mb-3 text-center">{error}</div>
+              )}
 
-            <Button
-              type="submit"
-              variant="primary"
-              className="w-100"
-              disabled={loading}
-            >
-              Login
-            </Button>
-          </Form>
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-100 py-2 mt-2 rounded-4 fw-bold"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+                  border: "none",
+                }}
+                disabled={loading}
+              >
+                Login
+              </Button>
+            </Form>
+          </div>
         </Col>
       </Row>
     </Container>

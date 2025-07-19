@@ -17,79 +17,74 @@ const Register = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phone: "",
     password: "",
+    confirmPassword: "",
     role: "client",
   });
 
+  const [error, setError] = useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     try {
       await registerUser(form);
       navigate("/login");
     } catch (err) {
-      alert("Registration failed");
+      setError("Registration failed. Please try again.");
     }
   };
 
   return (
-    <Container fluid className="vh-100">
-      <Row className="h-100">
+    <Container fluid className="vh-100 p-0">
+      <Row className="h-100 g-0">
         {/* Left Panel */}
         <Col
           md={6}
-          className="d-flex flex-column p-5"
+          className="d-flex flex-column justify-content-center align-items-center text-white p-5"
           style={{
-            background: "linear-gradient(135deg, #2196f3, #21cbf3)",
-            color: "#fff",
-            position: "relative",
-            fontFamily: "'Playfair Display', serif",
+            background: "linear-gradient(to right, #6a11cb, #2575fc)",
+            fontFamily: "'Segoe UI', sans-serif",
           }}
         >
-          {/* SB Works top-left */}
-          <div
+          <h1 style={{ fontSize: "3rem", fontWeight: "bold" }}>SB Works</h1>
+          <p
+            className="text-center mt-4"
             style={{
-              position: "absolute",
-              top: 20,
-              left: 20,
-              fontWeight: "700",
-              fontSize: "1.8rem",
-              color: "#eceff1",
-              fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-              userSelect: "none",
+              fontSize: "1.5rem",
+              maxWidth: "500px",
+              fontStyle: "italic",
+              opacity: 0.95,
             }}
           >
-            SB Works
-          </div>
-
-          {/* Centered quote */}
-          <div className="d-flex flex-grow-1 justify-content-center align-items-center">
-            <blockquote
-              className="text-center"
-              style={{
-                fontSize: "2.5rem",
-                fontStyle: "italic",
-                fontWeight: "600",
-                lineHeight: "1.3",
-                maxWidth: "500px",
-                userSelect: "none",
-              }}
-            >
-              “Do what you love, and you’ll never work a day in your life.”
-            </blockquote>
-          </div>
+            “Do what you love, and you’ll never work a day in your life.”
+          </p>
         </Col>
 
         {/* Right Panel */}
         <Col
           md={6}
-          className="d-flex justify-content-center align-items-center p-5 bg-light"
-          style={{ fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}
+          className="d-flex justify-content-center align-items-center"
+          style={{ backgroundColor: "#f9f9f9" }}
         >
-          <div style={{ width: "100%", maxWidth: "500px" }}>
-            <h2 className="mb-4 fw-semibold text-center">Create an Account</h2>
+          <div
+            className="p-4 shadow-lg rounded-4 w-100"
+            style={{
+              maxWidth: "450px",
+              background: "rgba(255, 255, 255, 0.95)",
+              border: "1px solid #e0e0e0",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <h3 className="text-center mb-4 fw-bold">Create an Account</h3>
 
-            {/* Role Switch */}
+            {/* Role toggle */}
             <Form.Group className="mb-4 text-center">
               <ButtonGroup>
                 {["client", "freelancer"].map((role) => (
@@ -106,6 +101,7 @@ const Register = () => {
                     onChange={(e) =>
                       setForm({ ...form, role: e.currentTarget.value })
                     }
+                    className="mx-2 rounded-pill px-4 fw-semibold"
                   >
                     {role.charAt(0).toUpperCase() + role.slice(1)}
                   </ToggleButton>
@@ -119,34 +115,26 @@ const Register = () => {
                 <Form.Control
                   type="text"
                   required
+                  placeholder="John Doe"
                   value={form.name}
                   onChange={(e) =>
                     setForm({ ...form, name: e.target.value })
                   }
+                  className="rounded-3"
                 />
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Email Address</Form.Label>
+                <Form.Label>Email address</Form.Label>
                 <Form.Control
                   type="email"
                   required
+                  placeholder="john@example.com"
                   value={form.email}
                   onChange={(e) =>
                     setForm({ ...form, email: e.target.value })
                   }
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label>Phone Number</Form.Label>
-                <Form.Control
-                  type="tel"
-                  required
-                  value={form.phone}
-                  onChange={(e) =>
-                    setForm({ ...form, phone: e.target.value })
-                  }
+                  className="rounded-3"
                 />
               </Form.Group>
 
@@ -155,15 +143,42 @@ const Register = () => {
                 <Form.Control
                   type="password"
                   required
+                  placeholder="Enter password"
                   value={form.password}
                   onChange={(e) =>
                     setForm({ ...form, password: e.target.value })
                   }
+                  className="rounded-3"
                 />
               </Form.Group>
 
-              <Button type="submit" variant="primary" className="w-100">
-                Create an Account
+              <Form.Group className="mb-3">
+                <Form.Label>Confirm Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  required
+                  placeholder="Re-enter password"
+                  value={form.confirmPassword}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  className="rounded-3"
+                />
+              </Form.Group>
+
+              {error && (
+                <div className="text-danger mb-3 text-center">{error}</div>
+              )}
+
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-100 mt-2 fw-bold rounded-3"
+              >
+                Register
               </Button>
             </Form>
           </div>
