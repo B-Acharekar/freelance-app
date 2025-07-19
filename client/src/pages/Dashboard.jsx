@@ -1,12 +1,13 @@
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   FaPlus,
   FaSearch,
   FaFolderOpen,
   FaClipboardList,
-  FaSignOutAlt,
+  FaUserCircle,
+  FaComments,
 } from 'react-icons/fa';
 
 const Dashboard = () => {
@@ -89,6 +90,31 @@ const Dashboard = () => {
             </Col>
           </>
         )}
+
+        {/* Common for both roles */}
+        <Col md={6}>
+          <Card className="h-100 shadow border-0 bg-light">
+            <Card.Body>
+              <Card.Title className="fw-semibold">
+                <FaUserCircle className="me-2 text-secondary" />My Profile
+              </Card.Title>
+              <Card.Text className="text-muted">Edit your profile, update skills and details.</Card.Text>
+              <Link to="/profile" className="btn btn-secondary w-100">Go to Profile</Link>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col md={6}>
+          <Card className="h-100 shadow border-0 bg-light">
+            <Card.Body>
+              <Card.Title className="fw-semibold">
+                <FaComments className="me-2 text-dark" />Chatroom
+              </Card.Title>
+              <Card.Text className="text-muted">Collaborate and chat with your clients or freelancers.</Card.Text>
+              <Link to="/chatroom" className="btn btn-dark w-100">Enter Chat</Link>
+            </Card.Body>
+          </Card>
+        </Col>
       </Row>
     </Container>
   );
