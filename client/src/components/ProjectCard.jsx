@@ -1,8 +1,8 @@
 import React from 'react';
-import { FaMoneyBillWave, FaTools, FaUserTie } from 'react-icons/fa';
+import { FaMoneyBillWave, FaTools, FaUserTie, FaComments, FaIdBadge } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
 
-const ProjectCard = ({ project, role }) => {
+const ProjectCard = ({ project, role, currentUserId }) => {
   const { title, description, budget, skillsRequired, clientId, _id } = project;
 
   return (
@@ -26,16 +26,32 @@ const ProjectCard = ({ project, role }) => {
           </li>
         </ul>
 
-        {/* Role-based action buttons */}
-        <div className="mt-4 d-flex justify-content-end">
+        <div className="mt-4 d-flex gap-2 flex-wrap justify-content-end">
           {role === 'freelancer' && (
-            <NavLink
-              to={`/applications/apply/${_id}`}
-              className="btn btn-sm btn-outline-success rounded-pill"
-            >
-              Apply Now
-            </NavLink>
+            <>
+              <NavLink
+                to={`/applications/apply/${_id}`}
+                className="btn btn-sm btn-outline-success rounded-pill"
+              >
+                Apply Now
+              </NavLink>
+
+              <NavLink
+                to={`/chatroom/${clientId?._id}/${_id}`}
+                className="btn btn-sm btn-outline-dark rounded-pill"
+              >
+                <FaComments className="me-1" /> Message Client
+              </NavLink>
+
+              <NavLink
+                to={`/profile/${clientId?._id}`}
+                className="btn btn-sm btn-outline-secondary rounded-pill"
+              >
+                <FaIdBadge className="me-1" /> View Profile
+              </NavLink>
+            </>
           )}
+
           {role === 'client' && (
             <NavLink
               to={`/applications/project/${_id}`}

@@ -9,11 +9,14 @@ import BrowseProjects from './pages/BrowseProjects';
 import MyApplications from "./pages/MyApplications";
 import ApplyForProjectWrapper from "./pages/ApplyForProjectWrapper";
 import ApplicationsByProjectWrapper from "./pages/ApplicationsByProjectWrapper";
+import PostedProjects from './pages/PostedProjects';
+import ChatRoom from './pages/ChatRoom';
+import Profile from './pages/Profile';
+import Footer from "./components/Footer";
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from "./components/ProjectedRoute";
-import PostedProjects from './pages/PostedProjects';
-import Footer from "./components/Footer";
-import ChatBox from "./pages/chatroom";
+import ChatList from './components/ChatList';
+
 function App() {
   return (
     <AuthProvider>
@@ -52,6 +55,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/applications/my"
             element={
@@ -60,6 +64,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/applications/apply/:projectId"
             element={
@@ -68,6 +73,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/applications/project/:projectId"
             element={
@@ -76,15 +82,37 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/my-projects"
+
+          <Route
+            path="/my-projects"
             element={
               <ProtectedRoute allowedRoles={['client']}>
                 <PostedProjects />
               </ProtectedRoute>
             }
           />
+          
+          <Route
+            path="/chatroom/:receiverId/:projectId"
+            element={
+              <ProtectedRoute allowedRoles={["client", "freelancer"]}>
+                <ChatRoom />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile/:id"
+            element={
+              <ProtectedRoute allowedRoles={["client", "freelancer"]}>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/chatlist" element={<ChatList />} />
+
         </Routes>
-      <Footer />
+        <Footer />
       </Router>
     </AuthProvider>
   );

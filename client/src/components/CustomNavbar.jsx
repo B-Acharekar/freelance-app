@@ -9,9 +9,6 @@ import {
 
 const CustomNavbar = () => {
   const { user, logout } = useAuth();
-  const [showChat, setShowChat] = useState(false);
-
-  const toggleChat = () => setShowChat(!showChat);
 
   return (
     <>
@@ -63,9 +60,15 @@ const CustomNavbar = () => {
                 </>
               )}
 
-              {user && (
-                <Nav.Link onClick={toggleChat} className="text-white d-flex align-items-center gap-1" style={{ cursor: 'pointer' }}>
-                  <FaComments /> Chat
+              {user?.role ==='client' && (
+                <Nav.Link
+                  as={NavLink}
+                  to="/chatlist"
+                  className="text-white d-flex align-items-center gap-2"
+                  style={{ fontWeight: '600' }}
+                >
+                  <FaComments />
+                  Messages
                 </Nav.Link>
               )}
 
@@ -109,30 +112,6 @@ const CustomNavbar = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
-      {/* Chat Sidebar / Offcanvas */}
-      <Offcanvas show={showChat} onHide={toggleChat} placement="end">
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Chat</Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>
-          {/* Replace this with your actual Chat component later */}
-          <div className="d-flex flex-column" style={{ height: '80vh' }}>
-            <div className="flex-grow-1 overflow-auto border p-2 mb-2 rounded bg-light">
-              <p><strong>User A:</strong> Hi there!</p>
-              <p><strong>User B:</strong> Hello!</p>
-            </div>
-            <div className="d-flex">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                className="form-control me-2"
-              />
-              <Button variant="primary">Send</Button>
-            </div>
-          </div>
-        </Offcanvas.Body>
-      </Offcanvas>
     </>
   );
 };

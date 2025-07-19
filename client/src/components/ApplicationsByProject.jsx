@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
   fetchApplicationsByProject,
@@ -11,7 +11,6 @@ import { Container, Row, Col, Alert, Spinner } from "react-bootstrap";
 const ApplicationsByProject = () => {
   const { token, user } = useAuth();
   const { projectId } = useParams();
-  const navigate = useNavigate();
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,6 +84,8 @@ const ApplicationsByProject = () => {
               <ApplicationReviewCard
                 app={app}
                 onDecision={handleDecision}
+                currentUserRole={user.role}
+                currentUserId={user._id}
               />
             </Col>
           ))}
