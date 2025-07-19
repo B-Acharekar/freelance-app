@@ -13,12 +13,15 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from "./components/ProjectedRoute";
 import PostedProjects from './pages/PostedProjects';
 import Footer from "./components/Footer";
+import Profile from "./pages/Profile";
+import ChatRoom from "./pages/ChatRoom";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <CustomNavbar />
+
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Home />} />
@@ -52,6 +55,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/applications/my"
             element={
@@ -60,6 +64,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/applications/apply/:projectId"
             element={
@@ -68,6 +73,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/applications/project/:projectId"
             element={
@@ -76,15 +82,36 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/my-projects"
+
+          <Route
+            path="/my-projects"
             element={
               <ProtectedRoute allowedRoles={['client']}>
                 <PostedProjects />
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute allowedRoles={['client', 'freelancer']}>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/chatroom"
+            element={
+              <ProtectedRoute allowedRoles={['client', 'freelancer']}>
+                <ChatRoom />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      <Footer />
+
+        <Footer />
       </Router>
     </AuthProvider>
   );
