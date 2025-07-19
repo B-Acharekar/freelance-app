@@ -1,13 +1,13 @@
 # Node modules
-node_modules/
+node_modules
 
 # Logs
-logs/
+logs
 *.log
 npm-debug.log*
 
 # Runtime data
-pids/
+pids
 *.pid
 *.seed
 
@@ -17,9 +17,9 @@ pids/
 # OS / IDE junk
 .DS_Store
 Thumbs.db
-.vscode/
-.idea/
+.vscode
+.idea
 
 # Optional: compiled output
-dist/
-build/
+dist
+build
