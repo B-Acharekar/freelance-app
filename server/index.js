@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/projectRoutes.js";
+import applicationRoutes from "./routes/applications.js";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 //Routes
 app.use("/api/auth",authRoutes);
 app.use('/api/projects', projectRoutes);
+app.use("/api/applications", applicationRoutes);
 
 
 // Connect to MongoDB Atlas
