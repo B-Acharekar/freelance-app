@@ -1,11 +1,12 @@
-const dotenv = require("dotenv");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/auth.js";
+import projectRoutes from "./routes/projectRoutes.js";
+
 dotenv.config();
 
-const express = require("express");
-const cors = require("cors");
-
-const authRoutes = require("./routes/auth");
-const connectDB = require("./config/db");
 
 const app = express();
 // Middleware
@@ -16,6 +17,8 @@ app.use(express.urlencoded({ extended: true }));
 
 //Routes
 app.use("/api/auth",authRoutes);
+app.use('/api/projects', projectRoutes);
+
 
 // Connect to MongoDB Atlas
 connectDB();
