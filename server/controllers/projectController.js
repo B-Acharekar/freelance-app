@@ -2,6 +2,10 @@ import Project from '../models/Project.js';
 
 // Create a new project (Client only)
 export const createProject = async (req, res) => {
+  if (req.user.role !== 'client') {
+  return res.status(403).json({ message: 'Only clients can create projects' });
+}
+
   try {
     const { title, description, budget, skillsRequired } = req.body;
     const clientId = req.user.id;

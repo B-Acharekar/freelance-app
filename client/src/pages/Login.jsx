@@ -43,7 +43,7 @@ const Login = () => {
 
     try {
       const res = await loginUser(form);
-      login(res.data.user.name, res.data.token);
+      login(res.data.user, res.data.token);
       navigate("/dashboard");
     } catch (err) {
       setError("Login failed. Check your credentials.");
