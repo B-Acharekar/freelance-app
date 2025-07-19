@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../models/Users");
 
 const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -20,9 +20,10 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+console.log("Login Email:", email); // 👈 Add this
 
   try {
-    const user = await User.findOne(email);
+    const user = await User.findOne({email});
     if (!user) return res.status(400).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -49,10 +50,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-exports.registerUser = (req, res) => {
-  res.send("Register endpoint hit!");
-};
-
-exports.loginUser = (req, res) => {
-  res.send("Login endpoint hit!");
+module.exports = {
+  registerUser,
+  loginUser,
 };
