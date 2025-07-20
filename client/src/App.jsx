@@ -19,6 +19,7 @@ import ProtectedRoute from "./components/ProjectedRoute";
 import ChatList from './components/ChatList';
 import FloatingBackButton from "./components/FloatingBackButton";
 import ChatPage from "./pages/ChatPage";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -38,6 +39,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/dashboard/admin"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
               </ProtectedRoute>
             }
           />

@@ -9,6 +9,7 @@ import {
   FaUserCircle,
   FaComments,
 } from "react-icons/fa";
+import Notifications from "../components/Notifications";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -113,6 +114,24 @@ const Dashboard = () => {
           btnVariant="secondary"
           link={`/profile/${user._id}`}
         />
+      </Row>
+
+      <h4 className="fw-semibold mt-5 mb-4 text-uppercase text-secondary">
+       Testing section...
+      </h4>
+      <Row>
+        <ActionCard
+          title="Admin Control"
+          text="Manage website"
+          icon={<FaUserCircle className="me-3 text-secondary" />}
+          btnText="Go to Admin Dashboard"
+          btnVariant="secondary"
+          link={`/dashboard/admin`}
+        />
+        <div className="my-5">
+        <Notifications/>
+
+        </div>
       </Row>
     </Container>
   );
