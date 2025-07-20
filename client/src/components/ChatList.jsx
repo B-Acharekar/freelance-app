@@ -1,32 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
-import { ListGroup, Spinner, Badge } from 'react-bootstrap';
+import { fetchChatThreads } from '../services/chatService';
+import { Spinner } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
-import { FaComments } from 'react-icons/fa'; // for chat icon
+import ChatThreadCard from '../components/ChatThreadCard';
 
 const ChatList = () => {
   const { token, user } = useAuth();
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!token) return;
+  const deduplicateThreads = (data) => {
+    const seen = new Set();
+    return data.filter((item) => {
+      const key = `${item.otherUserId}-${item.projectId}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
 
-    const fetchThreads = async () => {
+  useEffect(() => {
+    const getThreads = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/chat/threads', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setThreads(res.data);
-      } catch (error) {
-        console.error('Failed to fetch chat threads', error);
+        const data = await fetchChatThreads(token);
+        setThreads(deduplicateThreads(data));
+      } catch (err) {
+        console.error('Error fetching threads:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchThreads();
+    if (token) getThreads();
   }, [token]);
 
   if (!user || user.role !== 'client') {
@@ -50,33 +56,19 @@ const ChatList = () => {
   }
 
   return (
-    <div className="container mt-4" style={{ maxWidth: '600px' }}>
-      <h4 className="mb-3 text-center text-primary">Your Chat Threads</h4>
-      <ListGroup>
+    <div className="container mt-4" style={{ maxWidth: '700px' }}>
+      <h4 className="mb-4 text-center text-primary fw-bold">💬 Your Chat Threads</h4>
+      <div className="d-grid gap-3">
         {threads.map((thread, idx) => (
-          <ListGroup.Item
+          <NavLink
             key={idx}
-            action
-            as={NavLink}
             to={`/chatroom/${thread.otherUserId}/${thread.projectId}`}
-            className="d-flex justify-content-between align-items-center"
+            className="text-decoration-none"
           >
-            <div>
-              <FaComments className="me-2 text-primary" />
-              <strong>Chat with Freelancer</strong>
-              <br />
-              <small className="text-muted">
-                Project ID: <Badge bg="info">{thread.projectId}</Badge>
-              </small>
-            </div>
-            {thread.unreadCount > 0 && (
-              <Badge bg="danger" pill>
-                {thread.unreadCount}
-              </Badge>
-            )}
-          </ListGroup.Item>
+            <ChatThreadCard thread={thread} />
+          </NavLink>
         ))}
-      </ListGroup>
+      </div>
     </div>
   );
 };

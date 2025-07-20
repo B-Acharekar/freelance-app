@@ -1,5 +1,5 @@
-import Chat from '../models/Chat.js';
-
+import Chat from "../models/Chat.js";
+import User from "../models/Users.js";
 export const sendMessage = async (req, res) => {
   try {
     const { projectId, receiverId, message } = req.body;
@@ -33,7 +33,7 @@ export const getMessages = async (req, res) => {
 
     const chat = await Chat.findOne({ projectId });
 
-    if (!chat) return res.status(404).json({ message: 'No chat found' });
+    if (!chat) return res.status(404).json({ message: "No chat found" });
 
     const filtered = chat.messages.filter(
       (msg) =>
@@ -47,44 +47,72 @@ export const getMessages = async (req, res) => {
   }
 };
 
-// Controller
 export const getChatThreads = async (req, res) => {
   const userId = req.user.id;
 
-  // Find all chats where user is participant (sender or receiver in any message)
   const chats = await Chat.find({
-    "messages": {
+    messages: {
       $elemMatch: {
-        $or: [
-          { senderId: userId },
-          { receiverId: userId }
-        ]
-      }
-    }
+        $or: [{ senderId: userId }, { receiverId: userId }],
+      },
+    },
   });
-
-  // For each chat, get the other user(s) who messaged this user
-  // Build list of chat partners per project
 
   const threads = [];
 
-  chats.forEach(chat => {
-    // Get unique users in chat besides current user
+  for (const chat of chats) {
     const participants = new Set();
 
-    chat.messages.forEach(msg => {
-      if (msg.senderId.toString() !== userId) participants.add(msg.senderId.toString());
-      if (msg.receiverId.toString() !== userId) participants.add(msg.receiverId.toString());
-    });
+    for (const msg of chat.messages) {
+      if (msg.senderId.toString() !== userId)
+        participants.add(msg.senderId.toString());
+      if (msg.receiverId.toString() !== userId)
+        participants.add(msg.receiverId.toString());
+    }
 
-    participants.forEach(participantId => {
+    for (const participantId of participants) {
+      const user = await User.findById(participantId).select("name email");
+
+      const unreadCount = chat.messages.filter(
+        (msg) =>
+          msg.senderId.toString() === participantId &&
+          msg.receiverId.toString() === userId &&
+          !msg.read
+      ).length;
+      
       threads.push({
         projectId: chat.projectId,
         otherUserId: participantId,
+        otherUser: user,
+        unreadCount,
       });
-    });
-  });
+    }
+  }
 
-  res.json(threads);
+  return res.json(threads);
 };
 
+export const markMessagesAsRead = async (req, res) => {
+  const userId = req.user.id;
+  const { projectId, senderId } = req.body;
+
+  try {
+    const chat = await Chat.findOne({ projectId });
+    if (!chat) return res.status(404).json({ message: "Chat not found" });
+
+    for (let msg of chat.messages) {
+      if (
+        msg.senderId.toString() === senderId &&
+        msg.receiverId.toString() === userId &&
+        !msg.read
+      ) {
+        msg.read = true;
+      }
+    }
+
+    await chat.save();
+    res.status(200).json({ message: "Messages marked as read" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

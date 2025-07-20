@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import { useAuth } from "../context/AuthContext";
+import { fetchMessages, markMessagesAsRead } from "../services/chatService";
 
 const socket = io("http://localhost:5000");
 
 const ChatBox = ({ receiverId, projectId }) => {
-  const { user } = useAuth();
+  const { token, user } = useAuth();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
@@ -13,7 +14,6 @@ const ChatBox = ({ receiverId, projectId }) => {
   useEffect(() => {
     if (!user || !projectId) return;
 
-    console.log("Joining room with:", { projectId, userId: user._id });
     socket.emit("join-room", { projectId, userId: user._id });
 
     socket.on("new-message", (msg) => {
@@ -28,13 +28,6 @@ const ChatBox = ({ receiverId, projectId }) => {
   const handleSendMessage = () => {
     if (!message.trim()) return;
 
-    console.log("Sending message:", {
-      projectId,
-      senderId: user._id,
-      receiverId,
-      message,
-    });
-
     socket.emit("send-message", {
       projectId,
       senderId: user._id,
@@ -44,6 +37,22 @@ const ChatBox = ({ receiverId, projectId }) => {
 
     setMessage("");
   };
+
+  useEffect(() => {
+    const loadMessages = async () => {
+      try {
+        const fetched = await fetchMessages(user._id, receiverId, projectId, token);
+        setMessages(fetched);
+        await markMessagesAsRead(projectId, user._id, token);
+      } catch (err) {
+        console.error("Failed to fetch or mark messages:", err);
+      }
+    };
+
+    if (user && projectId && receiverId) {
+      loadMessages();
+    }
+  }, [user, token, projectId, receiverId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
