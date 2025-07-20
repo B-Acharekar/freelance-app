@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { getPostedProjects } from '../services/projectService'; 
+import { getPostedProjects } from '../services/projectService';
 import { fetchApplicationsByProject } from '../services/applicationService';
 import { NavLink } from 'react-router-dom';
-import { Card, Container, ListGroup, Button } from 'react-bootstrap';
-import { FaComments } from 'react-icons/fa';
+import { Card, Container, ListGroup, Button, Badge, Row, Col } from 'react-bootstrap';
+import { FaComments, FaBriefcase, FaUserTie } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 
 const PostedProjects = () => {
   const [postedProjects, setPostedProjects] = useState([]);
-  const [applicationsMap, setApplicationsMap] = useState({}); // { projectId: [applications] }
+  const [applicationsMap, setApplicationsMap] = useState({});
   const { token, user } = useAuth();
 
   useEffect(() => {
     const fetchProjectsAndApps = async () => {
       try {
-        // Fetch posted projects
         const res = await getPostedProjects(token);
         setPostedProjects(res.data);
 
-        // For each project, fetch applications
         const allApplications = {};
         for (const project of res.data) {
           const appsRes = await fetchApplicationsByProject(project._id, token);
@@ -34,50 +32,79 @@ const PostedProjects = () => {
   }, [token]);
 
   if (!user || user.role !== 'client') {
-    return <p className="text-center mt-5">Access denied. Only clients can see posted projects.</p>;
+    return (
+      <Container className="mt-5">
+        <h4 className="text-center text-danger">Access Denied</h4>
+        <p className="text-center">Only clients can view posted projects.</p>
+      </Container>
+    );
   }
 
   return (
-    <Container className="mt-5">
-      <h2 className="mb-4">Your Posted Projects</h2>
+    <Container className="my-5">
+      <h2 className="mb-4 fw-bold text-primary">
+        <FaBriefcase className="me-2" />
+        Your Posted Projects
+      </h2>
+
       {postedProjects.length === 0 ? (
-        <p>No projects posted yet.</p>
+        <p className="text-muted">You haven't posted any projects yet.</p>
       ) : (
         postedProjects.map((project) => (
-          <Card key={project._id} className="mb-4 shadow-sm">
+          <Card key={project._id} className="mb-4 border-0 shadow-sm rounded-4">
             <Card.Body>
-              <Card.Title>{project.title}</Card.Title>
-              <Card.Text>{project.description}</Card.Text>
+              <Row className="align-items-center">
+                <Col md={9}>
+                  <h4 className="fw-semibold mb-2">
+                    {project.title}{' '}
+                    <Badge bg="secondary" className="ms-2">
+                      {applicationsMap[project._id]?.length || 0} Applicants
+                    </Badge>
+                  </h4>
+                  <p className="text-muted">{project.description}</p>
+                </Col>
 
-              <NavLink
-                className="btn btn-sm btn-outline-primary mb-3"
-                to={`/applications/project/${project._id}`}
-              >
-                View Applicants
-              </NavLink>
+                <Col md={3} className="text-md-end mt-3 mt-md-0">
+                  <NavLink
+                    to={`/applications/project/${project._id}`}
+                    className="btn btn-outline-primary btn-sm rounded-pill fw-semibold"
+                  >
+                    View All Applicants
+                  </NavLink>
+                </Col>
+              </Row>
 
-              {/* List applicants directly here */}
-              <h6>Applicants:</h6>
+              {/* Applicants List */}
+              <hr />
+              <h6 className="text-muted mb-3">Recent Applicants:</h6>
+
               {applicationsMap[project._id]?.length > 0 ? (
-                <ListGroup>
+                <ListGroup variant="flush">
                   {applicationsMap[project._id].map((app) => (
-                    <ListGroup.Item key={app._id} className="d-flex justify-content-between align-items-center">
+                    <ListGroup.Item
+                      key={app._id}
+                      className="d-flex justify-content-between align-items-center"
+                    >
                       <div>
-                        <strong>{app.freelancerName || app.freelancerId?.name || 'Unnamed Freelancer'}</strong>
-                        <div className="small text-muted">{app.coverLetter}</div>
+                        <div className="fw-bold">
+                          <FaUserTie className="me-2 text-secondary" />
+                          {app.freelancerName || app.freelancerId?.name || 'Unnamed Freelancer'}
+                        </div>
+                        <div className="text-muted small">{app.coverLetter}</div>
                       </div>
 
                       <NavLink
                         to={`/chatroom/${app.freelancerId}/${project._id}`}
-                        className="btn btn-sm btn-outline-dark"
+                        className="btn btn-sm btn-outline-dark rounded-pill"
                       >
-                        <FaComments className="me-1" /> Message Freelancer
+                        <FaComments className="me-1" />
+                        Message
                       </NavLink>
                     </ListGroup.Item>
                   ))}
                 </ListGroup>
               ) : (
-                <p className="text-muted">No applicants yet.</p>
+                <p className="text-muted">No applicants for this project yet.</p>
               )}
             </Card.Body>
           </Card>

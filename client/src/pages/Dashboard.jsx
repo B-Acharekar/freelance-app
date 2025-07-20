@@ -1,6 +1,6 @@
-import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
-import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Container, Row, Col, Card, Badge } from "react-bootstrap";
+import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import {
   FaPlus,
   FaSearch,
@@ -8,116 +8,143 @@ import {
   FaClipboardList,
   FaUserCircle,
   FaComments,
-} from 'react-icons/fa';
+} from "react-icons/fa";
 
 const Dashboard = () => {
   const { user } = useAuth();
 
   return (
     <Container className="py-5">
-      <div className="d-flex justify-content-between align-items-center mb-5">
-        <div>
-          <h2 className="fw-bold mb-1">Welcome, {user?.name || user?.email}</h2>
-          <Badge bg="dark" className="text-uppercase">{user?.role}</Badge>
-        </div>
-      </div>
+      {/* Welcome Banner */}
+      <Card className="mb-5 border-0 shadow-sm rounded-4 bg-gradient-lightblue">
+        <Card.Body className="d-flex justify-content-between align-items-center flex-wrap">
+          <div>
+            <h2 className="fw-bold mb-1 text-primary">
+              Welcome back, {user?.name || user?.email}
+            </h2>
+            <Badge bg="dark" className="text-uppercase">
+              {user?.role}
+            </Badge>
+          </div>
+          <div className="text-end mt-3 mt-md-0">
+            <p className="mb-0 text-muted fs-6">
+              Here’s a quick overview of your activity.
+            </p>
+          </div>
+        </Card.Body>
+      </Card>
 
+      {/* Quick Actions Section */}
+      <h4 className="fw-semibold mb-4 text-uppercase text-secondary">
+        Quick Actions
+      </h4>
+      <Row className="g-4 mb-5">
+        {user?.role === "client" && (
+          <>
+            <ActionCard
+              title="Post a Project"
+              text="Hire top freelancers by posting your project."
+              icon={<FaPlus className="me-3 text-primary" />}
+              btnText="Post Now"
+              btnVariant="primary"
+              link="/projects/post"
+            />
+            <ActionCard
+              title="Browse Projects"
+              text="Explore available freelancers or project ideas."
+              icon={<FaSearch className="me-3 text-success" />}
+              btnText="Browse"
+              btnVariant="success"
+              link="/projects/browse"
+            />
+            <ActionCard
+              title="My Projects"
+              text="Manage all your posted projects."
+              icon={<FaFolderOpen className="me-3 text-warning" />}
+              btnText="View"
+              btnVariant="warning"
+              textWhite
+              link="/my-projects"
+            />
+            <ActionCard
+              title="Messages"
+              text="View and manage your chats with freelancers."
+              icon={<FaComments className="me-3 text-info" />}
+              btnText="Go to Messages"
+              btnVariant="info"
+              link="/chat"
+            />
+          </>
+        )}
+
+        {user?.role === "freelancer" && (
+          <>
+            <ActionCard
+              title="Browse Projects"
+              text="Find freelance work that fits your skills."
+              icon={<FaSearch className="me-3 text-success" />}
+              btnText="Find Projects"
+              btnVariant="success"
+              link="/projects/browse"
+            />
+            <ActionCard
+              title="My Applications"
+              text="Track all your applied projects and status."
+              icon={<FaClipboardList className="me-3 text-info" />}
+              btnText="Track"
+              btnVariant="info"
+              textWhite
+              link="/applications/my"
+            />
+          </>
+        )}
+      </Row>
+
+      {/* Profile Section */}
+      <h4 className="fw-semibold mb-4 text-uppercase text-secondary">
+        My Profile
+      </h4>
       <Row className="g-4">
-        {user?.role === 'client' && (
-          <>
-            <Col md={4}>
-              <Card className="h-100 shadow border-0 bg-light">
-                <Card.Body>
-                  <Card.Title className="fw-semibold">
-                    <FaPlus className="me-2 text-primary" />Post a Project
-                  </Card.Title>
-                  <Card.Text className="text-muted">Hire top freelancers by posting your project needs.</Card.Text>
-                  <Link to="/projects/post" className="btn btn-primary w-100">Post Now</Link>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col md={4}>
-              <Card className="h-100 shadow border-0 bg-light">
-                <Card.Body>
-                  <Card.Title className="fw-semibold">
-                    <FaSearch className="me-2 text-success" />Browse Projects
-                  </Card.Title>
-                  <Card.Text className="text-muted">Explore ongoing projects and freelancer profiles.</Card.Text>
-                  <Link to="/projects/browse" className="btn btn-success w-100">Browse</Link>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col md={4}>
-              <Card className="h-100 shadow border-0 bg-light">
-                <Card.Body>
-                  <Card.Title className="fw-semibold">
-                    <FaFolderOpen className="me-2 text-warning" />My Projects
-                  </Card.Title>
-                  <Card.Text className="text-muted">Manage and track all your posted projects.</Card.Text>
-                  <Link to="/my-projects" className="btn btn-warning text-white w-100">View</Link>
-                </Card.Body>
-              </Card>
-            </Col>
-          </>
-        )}
-
-        {user?.role === 'freelancer' && (
-          <>
-            <Col md={6}>
-              <Card className="h-100 shadow border-0 bg-light">
-                <Card.Body>
-                  <Card.Title className="fw-semibold">
-                    <FaSearch className="me-2 text-success" />Browse Projects
-                  </Card.Title>
-                  <Card.Text className="text-muted">Find work that matches your skills and goals.</Card.Text>
-                  <Link to="/projects/browse" className="btn btn-success w-100">Find Projects</Link>
-                </Card.Body>
-              </Card>
-            </Col>
-
-            <Col md={6}>
-              <Card className="h-100 shadow border-0 bg-light">
-                <Card.Body>
-                  <Card.Title className="fw-semibold">
-                    <FaClipboardList className="me-2 text-info" />My Applications
-                  </Card.Title>
-                  <Card.Text className="text-muted">Track your bids and application statuses.</Card.Text>
-                  <Link to="/applications/my" className="btn btn-info text-white w-100">Track</Link>
-                </Card.Body>
-              </Card>
-            </Col>
-          </>
-        )}
-
-        {/* Common for both roles */}
-        <Col md={6}>
-          <Card className="h-100 shadow border-0 bg-light">
-            <Card.Body>
-              <Card.Title className="fw-semibold">
-                <FaUserCircle className="me-2 text-secondary" />My Profile
-              </Card.Title>
-              <Card.Text className="text-muted">Edit your profile, update skills and details.</Card.Text>
-              <Link to="/profile" className="btn btn-secondary w-100">Go to Profile</Link>
-            </Card.Body>
-          </Card>
-        </Col>
-
-        <Col md={6}>
-          <Card className="h-100 shadow border-0 bg-light">
-            <Card.Body>
-              <Card.Title className="fw-semibold">
-                <FaComments className="me-2 text-dark" />Chatroom
-              </Card.Title>
-              <Card.Text className="text-muted">Collaborate and chat with your clients or freelancers.</Card.Text>
-              <Link to="/chatroom" className="btn btn-dark w-100">Enter Chat</Link>
-            </Card.Body>
-          </Card>
-        </Col>
+        <ActionCard
+          title="View/Edit Profile"
+          text="Manage your personal details, bio, and skills."
+          icon={<FaUserCircle className="me-3 text-secondary" />}
+          btnText="Go to Profile"
+          btnVariant="secondary"
+          link={`/profile/${user._id}`}
+        />
       </Row>
     </Container>
   );
 };
+
+const ActionCard = ({
+  title,
+  text,
+  icon,
+  btnText,
+  btnVariant,
+  link,
+  textWhite,
+}) => (
+  <Col md={4}>
+    <Card className="h-100 shadow-sm border-0 rounded-4 card-hover bg-white">
+      <Card.Body className="d-flex flex-column">
+        <Card.Title className="fw-semibold d-flex align-items-center text-uppercase fs-5 mb-3">
+          {icon} {title}
+        </Card.Title>
+        <Card.Text className="text-muted flex-grow-1">{text}</Card.Text>
+        <Link
+          to={link}
+          className={`btn btn-${btnVariant} w-100 mt-4 rounded-pill fw-semibold ${textWhite ? "text-white" : ""
+            }`}
+          style={{ boxShadow: "0 4px 8px rgb(0 0 0 / 0.1)" }}
+        >
+          {btnText}
+        </Link>
+      </Card.Body>
+    </Card>
+  </Col>
+);
 
 export default Dashboard;

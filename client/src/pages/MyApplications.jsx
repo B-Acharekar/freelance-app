@@ -4,19 +4,18 @@ import { fetchMyApplications } from "../services/applicationService";
 import {
   Container,
   Spinner,
-  Alert,
   Row,
   Col,
-  Card,
-  Badge,
 } from "react-bootstrap";
 import ApplicationCard from "../components/ApplicationCard";
+import UniversalAlert from "../components/UniversalAlert";
 
 export default function MyApplications() {
   const { token } = useAuth();
   const [applications, setApplications] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -27,6 +26,7 @@ export default function MyApplications() {
         setApplications(res.data);
       } catch (err) {
         setError(err.response?.data?.message || err.message);
+        setShowError(true);
       } finally {
         setLoading(false);
       }
@@ -38,9 +38,9 @@ export default function MyApplications() {
   return (
     <Container className="py-5">
       <div className="text-center mb-5">
-        <h2 className="fw-bold">My Applications</h2>
-        <p className="text-muted">
-          View the status of projects you've applied to.
+        <h2 className="fw-bold display-6">My Applications</h2>
+        <p className="text-muted fs-5">
+          Track and manage the projects you've applied to.
         </p>
       </div>
 
@@ -50,21 +50,23 @@ export default function MyApplications() {
         </div>
       )}
 
-      {error && (
-        <Alert variant="danger" className="text-center">
-          {error}
-        </Alert>
-      )}
+      <UniversalAlert
+        variant="error"
+        show={showError}
+        onClose={() => setShowError(false)}
+      >
+        {error}
+      </UniversalAlert>
 
-      {!loading && applications.length === 0 && (
-        <Alert variant="info" className="text-center">
-          You haven't applied to any projects yet.
-        </Alert>
+      {!loading && !error && applications.length === 0 && (
+        <UniversalAlert variant="info" show={true}>
+          You haven’t applied to any projects yet.
+        </UniversalAlert>
       )}
 
       <Row className="g-4">
         {applications.map((app) => (
-          <Col key={app._id} xs={12} sm={6} md={4}>
+          <Col key={app._id} xs={12} sm={6} lg={4}>
             <ApplicationCard app={app} />
           </Col>
         ))}

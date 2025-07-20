@@ -1,5 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
+import {
+  Form,
+  InputGroup,
+  Button,
+  Spinner,
+  Card,
+  Container,
+} from "react-bootstrap";
+import { Send } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
 import { fetchMessages, markMessagesAsRead } from "../services/chatService";
 
@@ -9,35 +18,27 @@ const ChatBox = ({ receiverId, projectId }) => {
   const { token, user } = useAuth();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
+  // Join socket room
   useEffect(() => {
     if (!user || !projectId) return;
 
     socket.emit("join-room", { projectId, userId: user._id });
 
-    socket.on("new-message", (msg) => {
+    const handleIncomingMessage = (msg) => {
       setMessages((prev) => [...prev, msg]);
-    });
+    };
+
+    socket.on("new-message", handleIncomingMessage);
 
     return () => {
-      socket.off("new-message");
+      socket.off("new-message", handleIncomingMessage);
     };
   }, [user, projectId]);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
-
-    socket.emit("send-message", {
-      projectId,
-      senderId: user._id,
-      receiverId,
-      message,
-    });
-
-    setMessage("");
-  };
-
+  // Fetch previous messages
   useEffect(() => {
     const loadMessages = async () => {
       try {
@@ -45,117 +46,92 @@ const ChatBox = ({ receiverId, projectId }) => {
         setMessages(fetched);
         await markMessagesAsRead(projectId, user._id, token);
       } catch (err) {
-        console.error("Failed to fetch or mark messages:", err);
+        console.error("Error loading messages", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    if (user && projectId && receiverId) {
+    if (user && receiverId && projectId) {
       loadMessages();
     }
-  }, [user, token, projectId, receiverId]);
+  }, [user, receiverId, projectId, token]);
 
+  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const handleSendMessage = () => {
+    if (!message.trim()) return;
+
+    const msgPayload = {
+      projectId,
+      senderId: user._id,
+      receiverId,
+      message,
+    };
+
+    socket.emit("send-message", msgPayload);
+    setMessage("");
+  };
+
   if (!user) return <p>Please log in to chat.</p>;
 
   return (
-    <div
-      style={{
-        border: "1px solid #ccc",
-        borderRadius: 6,
-        height: 400,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div
-        style={{
-          flexGrow: 1,
-          overflowY: "auto",
-          padding: "10px",
-          backgroundColor: "#f9f9f9",
-        }}
-      >
-        {messages.map((msg, idx) => {
-          const isSender = msg.senderId === user._id;
-          return (
-            <div
-              key={idx}
-              style={{
-                display: "flex",
-                justifyContent: isSender ? "flex-end" : "flex-start",
-                marginBottom: 8,
-              }}
-            >
+    <Card className="shadow rounded-4 h-100 d-flex flex-column">
+      <Card.Header className="bg-primary text-white fw-semibold fs-5">
+        Project Chat
+      </Card.Header>
+
+      <Card.Body className="flex-grow-1 overflow-auto px-4 py-3" style={{ backgroundColor: "#f4f6f8" }}>
+        {loading ? (
+          <div className="text-center mt-4">
+            <Spinner animation="border" variant="primary" />
+          </div>
+        ) : messages.length === 0 ? (
+          <p className="text-muted text-center">No messages yet.</p>
+        ) : (
+          messages.map((msg, idx) => {
+            const isSender = msg.senderId === user._id;
+            return (
               <div
-                style={{
-                  backgroundColor: isSender ? "#0d6efd" : "#e5e5ea",
-                  color: isSender ? "white" : "black",
-                  padding: "10px 15px",
-                  borderRadius: 20,
-                  maxWidth: "70%",
-                  wordBreak: "break-word",
-                }}
+                key={idx}
+                className={`d-flex mb-3 ${isSender ? "justify-content-end" : "justify-content-start"}`}
               >
-                {msg.message}
                 <div
-                  style={{
-                    fontSize: 10,
-                    color: isSender ? "#cce4ff" : "#555",
-                    textAlign: "right",
-                    marginTop: 4,
-                  }}
+                  className={`px-3 py-2 rounded-pill shadow-sm ${
+                    isSender ? "bg-primary text-white" : "bg-light"
+                  }`}
+                  style={{ maxWidth: "70%" }}
                 >
-                  {msg.sentAt
-                    ? new Date(msg.sentAt).toLocaleTimeString()
-                    : ""}
+                  <div>{msg.message}</div>
+                  <div className="text-end" style={{ fontSize: "0.75rem", opacity: 0.7 }}>
+                    {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString() : ""}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
         <div ref={messagesEndRef} />
-      </div>
+      </Card.Body>
 
-      <div
-        style={{
-          display: "flex",
-          padding: 10,
-          borderTop: "1px solid #ccc",
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Type a message..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          style={{
-            flexGrow: 1,
-            padding: "10px",
-            borderRadius: 20,
-            border: "1px solid #ccc",
-            outline: "none",
-          }}
-        />
-        <button
-          onClick={handleSendMessage}
-          style={{
-            marginLeft: 10,
-            padding: "10px 20px",
-            borderRadius: 20,
-            border: "none",
-            backgroundColor: "#0d6efd",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
-          Send
-        </button>
-      </div>
-    </div>
+      <Card.Footer className="p-3">
+        <InputGroup>
+          <Form.Control
+            placeholder="Type a message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+            className="rounded-pill"
+          />
+          <Button variant="primary" className="rounded-pill ms-2" onClick={handleSendMessage}>
+            <Send />
+          </Button>
+        </InputGroup>
+      </Card.Footer>
+    </Card>
   );
 };
 

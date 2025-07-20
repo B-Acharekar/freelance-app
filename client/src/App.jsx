@@ -12,16 +12,20 @@ import ApplicationsByProjectWrapper from "./pages/ApplicationsByProjectWrapper";
 import PostedProjects from './pages/PostedProjects';
 import ChatRoom from './pages/ChatRoom';
 import Profile from './pages/Profile';
+import FreelancerProfilePage from "./pages/FreelancerProfilePage";
 import Footer from "./components/Footer";
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from "./components/ProjectedRoute";
 import ChatList from './components/ChatList';
+import FloatingBackButton from "./components/FloatingBackButton";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <CustomNavbar />
+        <FloatingBackButton />
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Home />} />
@@ -91,12 +95,21 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           <Route
             path="/chatroom/:receiverId/:projectId"
             element={
               <ProtectedRoute allowedRoles={["client", "freelancer"]}>
                 <ChatRoom />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute allowedRoles={["client", "freelancer"]}>
+                <ChatPage />
               </ProtectedRoute>
             }
           />
@@ -109,7 +122,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/chatlist" element={<ChatList />} />
+          <Route
+            path="/freelancer/:id"
+            element={
+              <ProtectedRoute allowedRoles={["client", "freelancer"]}>
+                <FreelancerProfilePage />
+              </ProtectedRoute>
+            }
+          />
 
         </Routes>
         <Footer />

@@ -9,7 +9,7 @@ import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import applicationRoutes from "./routes/applications.js";
 import chatRoutes from "./routes/chat.js";
-import freelancerRoutes from "./routes/freelancer.js";
+import userRoutes from "./routes/user.js";
 import SocketHandler from "./sockets/chatSocket.js";
 
 dotenv.config();
@@ -40,7 +40,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/chat", chatRoutes);
-app.use("/api/freelancer", freelancerRoutes);
+app.use("/api/users", userRoutes);
 
 connectDB();
 

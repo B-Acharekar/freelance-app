@@ -1,9 +1,20 @@
-import React from "react";
-import { Card, Badge, OverlayTrigger, Tooltip, Button } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
-import { FaComments } from "react-icons/fa";
+import React from 'react';
+import { Card, Badge, Button } from 'react-bootstrap';
+import {
+  FaMoneyBill,
+  FaCalendarAlt,
+  FaExternalLinkAlt,
+  FaUserTie,
+  FaEnvelope,
+  FaUserCheck,
+  FaTimesCircle,
+} from 'react-icons/fa';
+import { formatDistanceToNow } from 'date-fns';
+import { NavLink } from 'react-router-dom';
 
-const ApplicationReviewCard = ({ app, onDecision, currentUserRole, currentUserId }) => {
+const ApplicationReviewCard = ({ app, onAccept, onReject }) => {
+  if (!app) return null;
+
   const {
     _id: applicationId,
     status,
@@ -12,79 +23,105 @@ const ApplicationReviewCard = ({ app, onDecision, currentUserRole, currentUserId
     coverLetter,
     portfolioLink,
     createdAt,
-    freelancerId, // This should be freelancer user id (object or string)
+    freelancerId,
   } = app;
 
-  const getStatusVariant = () => {
-    switch (status) {
-      case "accepted":
-        return "success";
-      case "rejected":
-        return "danger";
-      case "pending":
-      default:
-        return "secondary";
-    }
+  const freelancerName =
+    typeof freelancerId === 'object' ? freelancerId.name : 'Freelancer';
+  const freelancerEmail =
+    typeof freelancerId === 'object' ? freelancerId.email : '';
+  const freelancerIdValue =
+    typeof freelancerId === 'object' ? freelancerId._id : freelancerId;
+
+  const statusColor = {
+    accepted: 'success',
+    rejected: 'danger',
+    pending: 'secondary',
   };
 
   return (
-    <Card className="h-100 shadow-sm border-0">
-      <Card.Body className="position-relative">
-        <Badge
-          bg={getStatusVariant()}
-          className="position-absolute top-0 end-0 m-2 px-3 py-2"
-        >
-          {status?.toUpperCase() || "PENDING"}
-        </Badge>
+    <Card className="mb-4 shadow-sm border-0 rounded-4 px-2">
+      <Card.Body>
+        <div className="d-flex justify-content-between align-items-start mb-2">
+          <h5 className="fw-bold text-primary">{projectTitle}</h5>
+          <Badge bg={statusColor[status]} className="text-capitalize px-3 py-1 fs-6">
+            {status}
+          </Badge>
+        </div>
 
-        <Card.Title className="fw-bold text-primary">{projectTitle || "Untitled Project"}</Card.Title>
+        <p className="text-muted mb-3">
+          <FaCalendarAlt className="me-2 text-secondary" />
+          Applied {formatDistanceToNow(new Date(createdAt))} ago
+        </p>
 
-        <Card.Subtitle className="mb-3 text-muted">
-          Bid Amount: <strong>${bidAmount}</strong>
-        </Card.Subtitle>
+        <div className="mb-3">
+          <strong className="d-block mb-1 text-dark">
+            <FaMoneyBill className="me-2 text-success" />
+            Bid Amount:
+          </strong>
+          <span className="fs-5 fw-semibold">${bidAmount}</span>
+        </div>
 
-        <OverlayTrigger placement="top" overlay={<Tooltip>{coverLetter}</Tooltip>}>
-          <Card.Text className="text-truncate" style={{ maxWidth: "100%" }}>
-            <strong>Cover Letter:</strong>
-            <br />
-            {coverLetter}
-          </Card.Text>
-        </OverlayTrigger>
+        <div className="mb-3">
+          <strong className="d-block mb-1 text-dark">
+            <FaUserTie className="me-2 text-info" />
+            Freelancer:
+          </strong>
+          <span className="fw-semibold">{freelancerName}</span>
+          <br />
+          <FaEnvelope className="me-2 text-muted" />
+          <small className="text-muted">{freelancerEmail}</small>
+        </div>
+
+        <div className="mb-3">
+          <strong className="d-block mb-2 text-dark">Cover Letter:</strong>
+          <p className="text-body">{coverLetter}</p>
+        </div>
 
         {portfolioLink && (
-          <Card.Text className="mt-2">
-            <strong>Portfolio:</strong>{" "}
-            <a href={portfolioLink} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
-              View Project
+          <div className="mb-3">
+            <a
+              href={portfolioLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline-dark btn-sm rounded-pill"
+            >
+              View Portfolio <FaExternalLinkAlt className="ms-1" />
             </a>
-          </Card.Text>
-        )}
-
-        <Card.Text className="text-muted small mt-3">
-          Applied on: {new Date(createdAt).toLocaleDateString()}
-        </Card.Text>
-
-        {/* Decision buttons - only for client */}
-        {currentUserRole === "client" && status === "pending" && (
-          <div className="d-flex gap-2 mt-3">
-            <Button variant="success" size="sm" onClick={() => onDecision(applicationId, "accepted")}>
-              Accept
-            </Button>
-            <Button variant="danger" size="sm" onClick={() => onDecision(applicationId, "rejected")}>
-              Reject
-            </Button>
           </div>
         )}
 
-        {/* Chat button for client to message freelancer */}
-        {currentUserRole === "client" && (
+        <div className="d-flex justify-content-between align-items-center mt-4">
+          <div className="d-flex gap-2">
+            {status === 'pending' && (
+              <>
+                <Button
+                  variant="success"
+                  size="sm"
+                  className="rounded-pill d-flex align-items-center"
+                  onClick={() => onAccept(applicationId)}
+                >
+                  <FaUserCheck className="me-1" /> Accept
+                </Button>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  className="rounded-pill d-flex align-items-center"
+                  onClick={() => onReject(applicationId)}
+                >
+                  <FaTimesCircle className="me-1" /> Reject
+                </Button>
+              </>
+            )}
+          </div>
+
           <NavLink
-            to={`/chatroom/${freelancerId}/${app.projectId || app.project?._id}`}
-            className="btn btn-sm btn-outline-dark mt-3"
+            to={`/freelancer/${freelancerIdValue}`}
+            className="btn btn-outline-primary btn-sm rounded-pill"
           >
-            <FaComments className="me-1" /> Message Freelancer
+            View Profile
           </NavLink>
-        )}
+        </div>
       </Card.Body>
     </Card>
   );

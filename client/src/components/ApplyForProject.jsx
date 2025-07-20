@@ -9,8 +9,14 @@ import {
   Alert,
   FloatingLabel,
   Spinner,
+  Row,
+  Col,
 } from "react-bootstrap";
-import { FaPaperPlane, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+import {
+  FaPaperPlane,
+  FaCheckCircle,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 
 export default function ApplyForProject({ projectId }) {
   const { token } = useAuth();
@@ -54,43 +60,57 @@ export default function ApplyForProject({ projectId }) {
 
   return (
     <InfoCard title="Apply for This Project">
-      <Form onSubmit={handleSubmit} className="p-2">
-        <FloatingLabel controlId="coverLetter" label="Cover Letter" className="mb-3">
-          <Form.Control
-            as="textarea"
-            name="coverLetter"
-            required
-            style={{ height: "120px" }}
-            placeholder="Describe why you're a great fit..."
-            value={formData.coverLetter}
-            onChange={handleChange}
-          />
-        </FloatingLabel>
+      <Form onSubmit={handleSubmit} className="p-3">
+        <Row>
+          <Col md={12}>
+            <FloatingLabel controlId="coverLetter" label="Cover Letter" className="mb-4">
+              <Form.Control
+                as="textarea"
+                name="coverLetter"
+                required
+                style={{ height: "140px", resize: "none" }}
+                placeholder="Describe why you're a great fit..."
+                value={formData.coverLetter}
+                onChange={handleChange}
+              />
+            </FloatingLabel>
+          </Col>
 
-        <FloatingLabel controlId="bidAmount" label="Bid Amount ($)" className="mb-3">
-          <Form.Control
-            type="number"
-            name="bidAmount"
-            required
-            placeholder="Enter your bid"
-            value={formData.bidAmount}
-            onChange={handleChange}
-          />
-        </FloatingLabel>
+          <Col md={6}>
+            <FloatingLabel controlId="bidAmount" label="Bid Amount ($)" className="mb-4">
+              <Form.Control
+                type="number"
+                name="bidAmount"
+                required
+                placeholder="Enter your bid"
+                value={formData.bidAmount}
+                onChange={handleChange}
+              />
+            </FloatingLabel>
+          </Col>
 
-        <FloatingLabel controlId="portfolioLink" label="Portfolio URL" className="mb-4">
-          <Form.Control
-            type="url"
-            name="portfolioLink"
-            required
-            placeholder="https://yourportfolio.com"
-            value={formData.portfolioLink}
-            onChange={handleChange}
-          />
-        </FloatingLabel>
+          <Col md={6}>
+            <FloatingLabel controlId="portfolioLink" label="Portfolio URL" className="mb-4">
+              <Form.Control
+                type="url"
+                name="portfolioLink"
+                required
+                placeholder="https://yourportfolio.com"
+                value={formData.portfolioLink}
+                onChange={handleChange}
+              />
+            </FloatingLabel>
+          </Col>
+        </Row>
 
         <div className="d-grid">
-          <Button type="submit" variant="primary" disabled={loading}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            disabled={loading}
+            className="rounded-pill shadow-sm"
+          >
             {loading ? (
               <>
                 <Spinner animation="border" size="sm" className="me-2" />
@@ -107,10 +127,13 @@ export default function ApplyForProject({ projectId }) {
       </Form>
 
       {message && (
-        <Alert variant={variant} className="mt-4 d-flex align-items-center gap-2">
-          {variant === "success" && <FaCheckCircle />}
-          {variant === "danger" && <FaExclamationTriangle />}
-          <span>{message}</span>
+        <Alert
+          variant={variant}
+          className="mt-4 d-flex align-items-center gap-3 px-4 py-3 rounded-4 shadow-sm"
+        >
+          {variant === "success" && <FaCheckCircle size={18} />}
+          {variant === "danger" && <FaExclamationTriangle size={18} />}
+          <span className="fs-6">{message}</span>
         </Alert>
       )}
     </InfoCard>

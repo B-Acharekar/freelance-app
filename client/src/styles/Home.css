@@ -1,17 +1,13 @@
 .home-hero {
   min-height: 100vh;
+  background: linear-gradient(to bottom, rgba(10, 10, 10, 0.4), rgba(0, 0, 0, 0.9)),
+              url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1500&q=80') no-repeat center center / cover;
   position: relative;
-  background-image: url("https://images.unsplash.com/photo-1744555270794-6d378b9e7cd3?q=80&w=1380&auto=format&fit=crop");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  overflow: hidden;
 }
 
 .hero-overlay {
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  z-index: 1;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 /* Gradient text effect */
@@ -23,15 +19,14 @@
   color: transparent;                    
 }
 
-
-/* Gradient button */
 .btn-gradient {
-  background: linear-gradient(to right, #6a11cb, #2575fc);
+  background: linear-gradient(to right, #00c6ff, #0072ff);
   color: #fff;
   transition: all 0.3s ease;
 }
 
 .btn-gradient:hover {
-  opacity: 0.9;
-  transform: scale(1.03);
+  transform: translateY(-2px);
+  background: linear-gradient(to right, #0072ff, #00c6ff);
+  box-shadow: 0 8px 20px rgba(0, 114, 255, 0.4);
 }

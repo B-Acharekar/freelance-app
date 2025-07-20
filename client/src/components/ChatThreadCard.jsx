@@ -1,26 +1,31 @@
 import React from 'react';
 import { FaComments } from 'react-icons/fa';
-import { useParams } from 'react-router-dom';
+import { Badge } from 'react-bootstrap';
 
 const ChatThreadCard = ({ thread }) => {
-  const { receiverId: currentId, projectId: currentProject } = useParams();
-
-  const isActiveThread =
-    thread.otherUserId === currentId && thread.projectId === currentProject;
+  const { otherUser, unreadCount } = thread;
 
   return (
-    <div className="card shadow-sm rounded-4 p-3 d-flex flex-row justify-content-between align-items-center">
-      <div>
-        <div className="fw-semibold text-dark">
+    <div
+      className="card shadow-sm rounded-4 p-3 mb-3 border-0 thread-card d-flex flex-row justify-content-between align-items-center"
+      style={{
+        transition: 'all 0.3s ease',
+        cursor: 'pointer',
+        backgroundColor: '#f9f9f9',
+      }}
+    >
+      <div className="d-flex flex-column">
+        <div className="fw-semibold text-dark d-flex align-items-center mb-1">
           <FaComments className="me-2 text-primary" />
-          {thread.otherUser?.name || 'Freelancer'}
+          <span>{otherUser?.name || 'Freelancer'}</span>
         </div>
-        <div className="text-muted small">{thread.otherUser?.email}</div>
+        <div className="text-muted small">{otherUser?.email}</div>
       </div>
-      {!isActiveThread && thread.unreadCount > 0 && (
-        <span className="badge bg-danger rounded-pill">
-          {thread.unreadCount}
-        </span>
+
+      {unreadCount > 0 && (
+        <Badge pill bg="danger" className="ms-2">
+          {unreadCount}
+        </Badge>
       )}
     </div>
   );

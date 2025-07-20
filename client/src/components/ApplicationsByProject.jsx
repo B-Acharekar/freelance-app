@@ -6,7 +6,15 @@ import {
   updateApplicationStatus,
 } from "../services/applicationService";
 import ApplicationReviewCard from "../components/ApplicationReviewCard";
-import { Container, Row, Col, Alert, Spinner } from "react-bootstrap";
+import UniversalAlert from "../components/UniversalAlert";
+
+import {
+  Container,
+  Row,
+  Col,
+  Spinner,
+} from "react-bootstrap";
+import { FaClipboardList } from "react-icons/fa";
 
 const ApplicationsByProject = () => {
   const { token, user } = useAuth();
@@ -46,39 +54,52 @@ const ApplicationsByProject = () => {
       setVariant("success");
       setMessage(`Application ${decision}ed successfully.`);
     } catch (err) {
-      setVariant("danger");
+      setVariant("error");
       setMessage(err.response?.data?.message || `Failed to ${decision} application.`);
     }
   };
 
   if (!user || user.role !== "client") {
     return (
-      <Alert variant="danger" className="text-center mt-5">
-        Access Denied – Only clients can view applications.
-      </Alert>
+      <Container className="mt-5">
+        <UniversalAlert variant="error" show={true}>
+          Access Denied – Only clients can view applications.
+        </UniversalAlert>
+      </Container>
     );
   }
 
   return (
     <Container className="mt-5">
-      <h2 className="mb-4 text-center text-primary">Applications for This Project</h2>
+      <div className="text-center mb-4">
+        <h2 className="fw-bold text-primary d-flex align-items-center justify-content-center gap-2">
+          <FaClipboardList /> Applications for This Project
+        </h2>
+        <p className="text-muted">Review and manage incoming proposals</p>
+      </div>
 
-      {message && (
-        <Alert variant={variant} onClose={() => setMessage("")} dismissible>
-          {message}
-        </Alert>
-      )}
+      <UniversalAlert
+        variant={variant}
+        show={!!message}
+        onClose={() => setMessage("")}
+      >
+        {message}
+      </UniversalAlert>
 
       {loading ? (
         <div className="text-center py-5">
           <Spinner animation="border" variant="primary" />
         </div>
       ) : error ? (
-        <Alert variant="danger">{error}</Alert>
+        <UniversalAlert variant="error" show={true}>
+          {error}
+        </UniversalAlert>
       ) : applications.length === 0 ? (
-        <Alert variant="info">No applications found for this project.</Alert>
+        <UniversalAlert variant="info" show={true}>
+          No applications found for this project.
+        </UniversalAlert>
       ) : (
-        <Row xs={1} md={2} lg={2} className="g-4">
+        <Row xs={1} md={2} className="g-4">
           {applications.map((app) => (
             <Col key={app._id}>
               <ApplicationReviewCard
