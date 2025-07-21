@@ -94,10 +94,14 @@ export const updateApplicationStatus = async (req, res) => {
     }
 
     const application = await Application.findById(id).populate("projectId");
+
     if (!application) return res.status(404).json({ message: "Not found" });
 
-    // Only client who owns the project can update status
-    if (application.projectId.clientId.toString() !== req.user.id) {
+    if (
+      !application.projectId ||
+      !application.projectId.clientId ||
+      application.projectId.clientId.toString() !== req.user.id
+    ) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
@@ -106,6 +110,7 @@ export const updateApplicationStatus = async (req, res) => {
 
     res.json({ message: `Application ${status}` });
   } catch (err) {
+    console.error("Update application status error:", err);
     res.status(500).json({ error: err.message });
   }
 };

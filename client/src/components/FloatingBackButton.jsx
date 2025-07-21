@@ -6,7 +6,7 @@ const FloatingBackButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const hidePaths = ['/', '/dashboard','/dashboard/admin'];
+  const hidePaths = ['/', '/dashboard','/dashboard/admin','/login','/register'];
   if (hidePaths.includes(location.pathname)) return null;
 
   return (
