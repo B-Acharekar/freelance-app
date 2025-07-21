@@ -5,12 +5,16 @@ import User from "../models/Users.js";
 
 export const createApplication = async (req, res) => {
   try {
-    const { coverLetter, bidAmount, portfolioLink } = req.body;
+    const { coverLetter, bidAmount, portfolioLink, portfolioFile } = req.body;
     const projectId = req.params.projectId;
     const user = await User.findById(req.user.id);
 
     if (!user || user.role !== "freelancer") {
       return res.status(403).json({ message: "Only freelancers can apply" });
+    }
+
+    if (!portfolioFile) {
+      return res.status(400).json({ message: "Portfolio file is required." });
     }
 
     const application = new Application({
@@ -19,6 +23,7 @@ export const createApplication = async (req, res) => {
       coverLetter,
       bidAmount,
       portfolioLink,
+      portfolioFile,
     });
 
     await application.save();
@@ -68,6 +73,7 @@ export const getMyApplications = async (req, res) => {
       bidAmount: app.bidAmount,
       coverLetter: app.coverLetter,
       portfolioLink: app.portfolioLink,
+      portfolioFile:app.portfolioFile,
       status: app.status, // 👈 Include status
       createdAt: app.createdAt,
     }));

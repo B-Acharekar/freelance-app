@@ -8,6 +8,7 @@ import {
   FaEnvelope,
   FaUserCheck,
   FaTimesCircle,
+  FaFileDownload,
 } from 'react-icons/fa';
 import { formatDistanceToNow } from 'date-fns';
 import { NavLink } from 'react-router-dom';
@@ -22,6 +23,7 @@ const ApplicationReviewCard = ({ app, onAccept, onReject }) => {
     bidAmount,
     coverLetter,
     portfolioLink,
+    portfolioFile,
     createdAt,
     freelancerId,
   } = app;
@@ -37,6 +39,41 @@ const ApplicationReviewCard = ({ app, onAccept, onReject }) => {
     accepted: 'success',
     rejected: 'danger',
     pending: 'secondary',
+  };
+
+  const renderPortfolioSection = () => {
+    if (portfolioFile) {
+      return (
+        <div className="mb-3">
+          <a
+            href={portfolioFile}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-outline-dark btn-sm rounded-pill"
+            download
+          >
+            Download Resume <FaFileDownload className="ms-1" />
+          </a>
+        </div>
+      );
+    }
+
+    if (portfolioLink) {
+      return (
+        <div className="mb-3">
+          <a
+            href={portfolioLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-outline-dark btn-sm rounded-pill"
+          >
+            View Portfolio <FaExternalLinkAlt className="ms-1" />
+          </a>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -78,18 +115,7 @@ const ApplicationReviewCard = ({ app, onAccept, onReject }) => {
           <p className="text-body">{coverLetter}</p>
         </div>
 
-        {portfolioLink && (
-          <div className="mb-3">
-            <a
-              href={portfolioLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline-dark btn-sm rounded-pill"
-            >
-              View Portfolio <FaExternalLinkAlt className="ms-1" />
-            </a>
-          </div>
-        )}
+        {renderPortfolioSection()}
 
         <div className="d-flex justify-content-between align-items-center mt-4">
           <div className="d-flex gap-2">

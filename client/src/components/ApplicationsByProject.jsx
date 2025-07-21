@@ -104,7 +104,8 @@ const ApplicationsByProject = () => {
             <Col key={app._id}>
               <ApplicationReviewCard
                 app={app}
-                onDecision={handleDecision}
+                onAccept={(id) => handleDecision(id, 'accepted')}
+                onReject={(id) => handleDecision(id, 'rejected')}
                 currentUserRole={user.role}
                 currentUserId={user._id}
               />

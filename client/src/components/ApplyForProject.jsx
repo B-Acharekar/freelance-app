@@ -1,141 +1,135 @@
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { applyForProject } from "../services/applicationService";
-import InfoCard from "../components/InfoCard";
-import {
-  Form,
-  Button,
-  Alert,
-  FloatingLabel,
-  Spinner,
-  Row,
-  Col,
-} from "react-bootstrap";
-import {
-  FaPaperPlane,
-  FaCheckCircle,
-  FaExclamationTriangle,
-} from "react-icons/fa";
+import PortfolioUploader from "../components/PortfolioUploader";
+import { Alert, Button, Card, Form } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 
-export default function ApplyForProject({ projectId }) {
-  const { token } = useAuth();
+const ApplyForProject = () => {
+  const { user, token } = useAuth();
   const navigate = useNavigate();
+  const { projectId } = useParams();
 
   const [formData, setFormData] = useState({
     coverLetter: "",
     bidAmount: "",
     portfolioLink: "",
+    portfolioFileUrl: "",
   });
 
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [variant, setVariant] = useState("info");
+  const [variant, setVariant] = useState("success");
 
-  const handleChange = (e) =>
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePortfolioUpload = (url) => {
+    setFormData((prev) => ({ ...prev, portfolioFileUrl: url }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!token) {
+    if (!formData.portfolioFileUrl) {
       setVariant("warning");
-      setMessage("You must be logged in to apply.");
+      setMessage("Please upload a portfolio file before submitting.");
       return;
     }
 
-    setLoading(true);
     try {
-      const res = await applyForProject(projectId, formData, token);
-      setVariant("success");
-      setMessage(res.data.message || "Application submitted successfully.");
-      setTimeout(() => navigate("/dashboard"), 1500);
-    } catch (err) {
+      const res = await applyForProject(
+        projectId,
+        {
+          ...formData,
+          portfolioFile: formData.portfolioFileUrl,
+        },
+        token
+      );
+
+      if (res.status === 201) {
+        setVariant("success");
+        setMessage("Application submitted successfully!");
+        setFormData({
+          coverLetter: "",
+          bidAmount: "",
+          portfolioLink: "",
+          portfolioFileUrl: "",
+        });
+        const timeout = setTimeout(() => {
+          navigate("/dashboard");
+        }, 5000);
+      }
+    } catch (error) {
+      console.error("Application error:", error);
       setVariant("danger");
-      setMessage(err.response?.data?.message || "Failed to submit application.");
-    } finally {
-      setLoading(false);
+      setMessage("Failed to submit application. Try again.");
     }
   };
 
   return (
-    <InfoCard title="Apply for This Project">
-      <Form onSubmit={handleSubmit} className="p-3">
-        <Row>
-          <Col md={12}>
-            <FloatingLabel controlId="coverLetter" label="Cover Letter" className="mb-4">
-              <Form.Control
-                as="textarea"
-                name="coverLetter"
-                required
-                style={{ height: "140px", resize: "none" }}
-                placeholder="Describe why you're a great fit..."
-                value={formData.coverLetter}
-                onChange={handleChange}
-              />
-            </FloatingLabel>
-          </Col>
+    <Card className="p-4 shadow-sm rounded-4 mt-4">
+      <h3 className="mb-4">Apply for Project</h3>
+      {message && <Alert variant={variant}>{message}</Alert>}
 
-          <Col md={6}>
-            <FloatingLabel controlId="bidAmount" label="Bid Amount ($)" className="mb-4">
-              <Form.Control
-                type="number"
-                name="bidAmount"
-                required
-                placeholder="Enter your bid"
-                value={formData.bidAmount}
-                onChange={handleChange}
-              />
-            </FloatingLabel>
-          </Col>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3">
+          <Form.Label>Cover Letter</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={4}
+            name="coverLetter"
+            value={formData.coverLetter}
+            onChange={handleChange}
+            required
+            placeholder="Write a brief cover letter..."
+          />
+        </Form.Group>
 
-          <Col md={6}>
-            <FloatingLabel controlId="portfolioLink" label="Portfolio URL" className="mb-4">
-              <Form.Control
-                type="url"
-                name="portfolioLink"
-                required
-                placeholder="https://yourportfolio.com"
-                value={formData.portfolioLink}
-                onChange={handleChange}
-              />
-            </FloatingLabel>
-          </Col>
-        </Row>
+        <Form.Group className="mb-3">
+          <Form.Label>Bid Amount (₹)</Form.Label>
+          <Form.Control
+            type="number"
+            name="bidAmount"
+            value={formData.bidAmount}
+            onChange={handleChange}
+            required
+            placeholder="Enter your bid"
+          />
+        </Form.Group>
 
-        <div className="d-grid">
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            disabled={loading}
-            className="rounded-pill shadow-sm"
-          >
-            {loading ? (
-              <>
-                <Spinner animation="border" size="sm" className="me-2" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <FaPaperPlane className="me-2" />
-                Submit Application
-              </>
-            )}
-          </Button>
-        </div>
+        <Form.Group className="mb-3">
+          <Form.Label>Portfolio Website (optional)</Form.Label>
+          <Form.Control
+            type="url"
+            name="portfolioLink"
+            value={formData.portfolioLink}
+            onChange={handleChange}
+            placeholder="https://yourportfolio.com"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Upload Portfolio File (PDF/Images)</Form.Label>
+          <PortfolioUploader onUpload={handlePortfolioUpload} />
+          {formData.portfolioFileUrl && (
+            <div className="text-success mt-2">
+              Uploaded:{" "}
+              <a href={formData.portfolioFileUrl} target="_blank" rel="noreferrer">
+                View file
+              </a>
+            </div>
+          )}
+        </Form.Group>
+
+        <Button variant="primary" type="submit" className="rounded-pill">
+          Submit Application
+        </Button>
       </Form>
-
-      {message && (
-        <Alert
-          variant={variant}
-          className="mt-4 d-flex align-items-center gap-3 px-4 py-3 rounded-4 shadow-sm"
-        >
-          {variant === "success" && <FaCheckCircle size={18} />}
-          {variant === "danger" && <FaExclamationTriangle size={18} />}
-          <span className="fs-6">{message}</span>
-        </Alert>
-      )}
-    </InfoCard>
+    </Card>
   );
-}
+};
+
+export default ApplyForProject;

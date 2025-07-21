@@ -1,8 +1,9 @@
+// src/services/uploadService.js
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
-export const uploadFileToCloudinary = async (file) => {
+export const uploadFileToCloudinary = async (file, onProgress) => {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -10,6 +11,8 @@ export const uploadFileToCloudinary = async (file) => {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+    onUploadProgress: onProgress,
+    withCredentials: true,
   });
 
   return response.data;

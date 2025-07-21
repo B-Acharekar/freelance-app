@@ -1,15 +1,15 @@
 // server/models/Application.js
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const applicationSchema = new mongoose.Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project',
+    ref: "Project",
     required: true,
   },
   freelancerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   coverLetter: {
@@ -23,10 +23,14 @@ const applicationSchema = new mongoose.Schema({
   portfolioLink: {
     type: String,
   },
+  portfolioFile: {
+    type: String,
+    required: true,
+  },
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'rejected'],
-    default: 'pending',
+    enum: ["pending", "accepted", "rejected"],
+    default: "pending",
   },
   createdAt: {
     type: Date,
@@ -34,5 +38,5 @@ const applicationSchema = new mongoose.Schema({
   },
 });
 
-const Application = mongoose.model('Application', applicationSchema);
+const Application = mongoose.model("Application", applicationSchema);
 export default Application;

@@ -1,5 +1,5 @@
 import { Card, Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { FaExternalLinkAlt } from "react-icons/fa";
+import { FaExternalLinkAlt, FaFileDownload } from "react-icons/fa";
 
 const ApplicationCard = ({ app }) => {
   const {
@@ -9,6 +9,7 @@ const ApplicationCard = ({ app }) => {
     status,
     coverLetter,
     portfolioLink,
+    portfolioFile,
     createdAt,
   } = app;
 
@@ -25,7 +26,7 @@ const ApplicationCard = ({ app }) => {
   };
 
   return (
-    <Card className="h-100 shadow-sm border-0 rounded-4 p-2">
+    <Card className="h-100 shadow-sm border-0 rounded-4 p-3">
       <Card.Body className="position-relative">
         <Badge
           bg={getStatusVariant()}
@@ -40,7 +41,7 @@ const ApplicationCard = ({ app }) => {
         </Card.Title>
 
         <Card.Subtitle className="mb-3 text-muted">
-          <span className="fw-semibold">Bid:</span> ${bidAmount}
+          <span className="fw-semibold">Bid:</span> ₹{bidAmount}
         </Card.Subtitle>
 
         <OverlayTrigger
@@ -55,6 +56,7 @@ const ApplicationCard = ({ app }) => {
           </Card.Text>
         </OverlayTrigger>
 
+        {/* Portfolio Link */}
         {portfolioLink && (
           <Card.Text className="mt-3">
             <strong>Portfolio:</strong>{" "}
@@ -64,7 +66,23 @@ const ApplicationCard = ({ app }) => {
               rel="noopener noreferrer"
               className="text-decoration-none text-primary fw-semibold d-inline-flex align-items-center gap-1"
             >
-              View Project <FaExternalLinkAlt size={12} />
+              View Website <FaExternalLinkAlt size={12} />
+            </a>
+          </Card.Text>
+        )}
+
+        {/* Portfolio File */}
+        {portfolioFile && (
+          <Card.Text className="mt-2">
+            <strong>Portfolio File:</strong>{" "}
+            <a
+              href={portfolioFile}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-decoration-none text-success fw-semibold d-inline-flex align-items-center gap-1"
+              download
+            >
+              Download File <FaFileDownload size={14} />
             </a>
           </Card.Text>
         )}
