@@ -1,271 +1,173 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col, Tabs, Tab, Button, Spinner, Alert, Card, Badge } from 'react-bootstrap';
+import { getAdminData, blockUser } from '../services/adminService';
+import AdminStatCard from '../components/AdminStatCard';
+import AnnouncementPanel from '../components/AnnouncementPanel';
 
-function AdminDashboard() {
-  // Dummy data
-  const [users, setUsers] = useState([
-    { _id: '1', name: 'Alice', email: 'alice@example.com', role: 'user', status: 'active' },
-    { _id: '2', name: 'Bob', email: 'bob@example.com', role: 'admin', status: 'active' },
-    { _id: '3', name: 'Charlie', email: 'charlie@example.com', role: 'user', status: 'suspended' },
-  ]);
+const AdminDashboard = () => {
+  const [users, setUsers] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [projects] = useState([
-    { id: 'p1', title: 'Build Landing Page', owner: 'Alice', status: 'ongoing' },
-    { id: 'p2', title: 'Mobile App Design', owner: 'Bob', status: 'completed' },
-    { id: 'p3', title: 'Backend API', owner: 'Charlie', status: 'ongoing' },
-  ]);
-
-  const [newsletters] = useState([
-    { id: 'n1', title: 'Weekly Update', sentDate: '2025-07-10', subscribers: 500 },
-    { id: 'n2', title: 'Product Launch', sentDate: '2025-06-25', subscribers: 480 },
-  ]);
-
-  const [activityLogs] = useState([
-    { id: 'a1', activity: 'Alice logged in', date: '2025-07-19 10:30 AM' },
-    { id: 'a2', activity: 'Bob created a new project', date: '2025-07-19 9:15 AM' },
-    { id: 'a3', activity: 'Charlie suspended', date: '2025-07-18 4:50 PM' },
-    { id: 'a4', activity: 'Newsletter sent to 500 subscribers', date: '2025-07-17 12:00 PM' },
-  ]);
-
-  // State for user actions
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [confirmAction, setConfirmAction] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null);
-
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editUserData, setEditUserData] = useState(null);
-
-  // Handlers
-  const openConfirm = (action, user) => {
-    setConfirmAction(action);
-    setSelectedUser(user);
-    setShowConfirm(true);
-  };
-
-  const handleConfirm = () => {
-    if (confirmAction === 'delete') {
-      setUsers(users.filter((u) => u._id !== selectedUser._id));
-    } else if (confirmAction === 'toggleStatus') {
-      setUsers(users.map(u =>
-        u._id === selectedUser._id
-          ? { ...u, status: u.status === 'active' ? 'suspended' : 'active' }
-          : u
-      ));
+  const fetchData = async () => {
+    try {
+      const { users, projects, applications } = await getAdminData();
+      setUsers(users);
+      setProjects(projects);
+      setApplications(applications);
+      setError("");
+    } catch (err) {
+      console.error("Failed to load admin data:", err);
+      setError("Unauthorized or session expired. Please login again.");
+    } finally {
+      setLoading(false);
     }
-    setShowConfirm(false);
-    setSelectedUser(null);
   };
 
-  const openEditModal = (user) => {
-    setEditUserData({...user});
-    setShowEditModal(true);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleBlockToggle = async (userId) => {
+    try {
+      await blockUser(userId);
+      setUsers(prev =>
+        prev.map(u => u._id === userId ? { ...u, isBlocked: !u.isBlocked } : u)
+      );
+    } catch (err) {
+      alert("Failed to update user status");
+    }
   };
 
-  const saveEdit = () => {
-    setUsers(users.map(u => u._id === editUserData._id ? editUserData : u));
-    setShowEditModal(false);
-    setEditUserData(null);
+  const stats = {
+    totalUsers: users.length,
+    activeUsers: users.filter(u => !u.isBlocked).length,
+    totalProjects: projects.length,
+    totalApplications: applications.length,
   };
 
-  // Summary stats
-  const totalUsers = users.length;
-  const activeUsers = users.filter(u => u.status === 'active').length;
-  const totalProjects = projects.length;
-  const totalNewsletters = newsletters.length;
+  if (loading) {
+    return (
+      <Container className="py-5 text-center">
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3">Loading admin dashboard...</p>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="py-5">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    );
+  }
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">Admin Dashboard</h2>
+    <Container className="py-5">
+      <h2 className="fw-bold mb-4">Admin Dashboard</h2>
+      <Row className="g-4">
+        <Col md={3}><AdminStatCard type="users" count={stats.totalUsers} label="Total Users" /></Col>
+        <Col md={3}><AdminStatCard type="activeUsers" count={stats.activeUsers} label="Active Users" /></Col>
+        <Col md={3}><AdminStatCard type="projects" count={stats.totalProjects} label="Total Projects" /></Col>
+        <Col md={3}><AdminStatCard type="applications" count={stats.totalApplications} label="Total Applications" /></Col>
+      </Row>
 
-      {/* Summary Cards */}
-      <div className="row mb-4">
-        <div className="col-md-3 mb-3">
-          <div className="card text-white bg-primary h-100">
-            <div className="card-body">
-              <h5 className="card-title">Total Users</h5>
-              <p className="card-text fs-3">{totalUsers}</p>
-              <small>Active: {activeUsers}</small>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div className="card text-white bg-success h-100">
-            <div className="card-body">
-              <h5 className="card-title">Total Projects</h5>
-              <p className="card-text fs-3">{totalProjects}</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div className="card text-white bg-info h-100">
-            <div className="card-body">
-              <h5 className="card-title">Newsletters Sent</h5>
-              <p className="card-text fs-3">{totalNewsletters}</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3 mb-3">
-          <div className="card text-white bg-warning h-100">
-            <div className="card-body">
-              <h5 className="card-title">Recent Activities</h5>
-              <p className="card-text fs-3">{activityLogs.length}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Tabs defaultActiveKey="users" className="my-5 pt-4">
+        {/* USERS */}
+        <Tab eventKey="users" title="Users">
+          <Row className="g-4 mt-3">
+            {users.map(u => (
+              <Col md={4} key={u._id}>
+                <Card className="shadow-sm rounded-4 p-3 h-100">
+                  <Card.Body>
+                    <Card.Title className="fw-bold">{u.name}</Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">{u.email}</Card.Subtitle>
 
-      {/* Users Section */}
-      <h3 className="mb-3">Users Management</h3>
-      <div className="row mb-5">
-        {users.map(user => (
-          <div className="col-md-4 mb-3" key={user._id}>
-            <div className={`card ${user.status === 'active' ? '' : 'border-warning'}`}>
-              <div className="card-body">
-                <h5 className="card-title">{user.name}</h5>
-                <h6 className="card-subtitle mb-2 text-muted">{user.email}</h6>
-                <p>
-                  <span className={`badge bg-${user.role === 'admin' ? 'danger' : 'secondary'} me-2`}>
-                    {user.role}
-                  </span>
-                  <span className={`badge bg-${user.status === 'active' ? 'success' : 'warning'}`}>
-                    {user.status}
-                  </span>
-                </p>
-                <button className="btn btn-primary btn-sm me-2" onClick={() => openEditModal(user)}>Edit</button>
-                <button
-                  className={`btn btn-sm me-2 ${user.status === 'active' ? 'btn-warning' : 'btn-success'}`}
-                  onClick={() => openConfirm('toggleStatus', user)}
-                >
-                  {user.status === 'active' ? 'Suspend' : 'Reactivate'}
-                </button>
-                <button className="btn btn-danger btn-sm" onClick={() => openConfirm('delete', user)}>Delete</button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+                      <Badge bg={u.isBlocked ? "danger" : "success"}>
+                        {u.isBlocked ? "Blocked" : "Active"}
+                      </Badge>
+                      <small className="text-muted">{u.role}</small>
+                    </div>
 
-      {/* Projects Section */}
-      <h3 className="mb-3">Projects</h3>
-      <div className="row mb-5">
-        {projects.map(proj => (
-          <div className="col-md-4 mb-3" key={proj.id}>
-            <div className="card border-info">
-              <div className="card-body">
-                <h5 className="card-title">{proj.title}</h5>
-                <p className="card-text">Owner: {proj.owner}</p>
-                <span className={`badge bg-${proj.status === 'completed' ? 'success' : 'primary'}`}>
-                  {proj.status}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+                    <Button
+                      variant={u.isBlocked ? 'success' : 'danger'}
+                      size="sm"
+                      className="mt-3 w-100"
+                      onClick={() => handleBlockToggle(u._id)}
+                    >
+                      {u.isBlocked ? 'Unblock' : 'Block'}
+                    </Button>
 
-      {/* Newsletters Section */}
-      <h3 className="mb-3">Newsletters</h3>
-      <div className="row mb-5">
-        {newsletters.map(nl => (
-          <div className="col-md-6 mb-3" key={nl.id}>
-            <div className="card border-info">
-              <div className="card-body">
-                <h5 className="card-title">{nl.title}</h5>
-                <p className="card-text">Sent Date: {nl.sentDate}</p>
-                <p className="card-text">Subscribers: {nl.subscribers}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+                    <p className="text-muted text-end mt-2 mb-0">
+                      <small>Joined on: {new Date(u.createdAt).toLocaleDateString()}</small>
+                    </p>
+                  </Card.Body>
+                </Card>
 
-      {/* Activity Logs */}
-      <h3 className="mb-3">Activity Logs</h3>
-      <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-        {activityLogs.map(log => (
-          <div key={log.id} className="alert alert-light border mb-2">
-            <small>{log.date}</small>
-            <p className="mb-0">{log.activity}</p>
-          </div>
-        ))}
-      </div>
+              </Col>
+            ))}
+          </Row>
+        </Tab>
 
-      {/* Confirm Modal */}
-      {showConfirm && (
-        <div className="modal show d-block" tabIndex="-1" role="dialog" style={{backgroundColor:'rgba(0,0,0,0.5)'}}>
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Confirm {confirmAction === 'delete' ? 'Delete' : 'Status Change'}</h5>
-                <button type="button" className="btn-close" onClick={() => setShowConfirm(false)}></button>
-              </div>
-              <div className="modal-body">
-                {confirmAction === 'delete' && (
-                  <p>Are you sure you want to delete user <strong>{selectedUser.name}</strong>?</p>
-                )}
-                {confirmAction === 'toggleStatus' && (
-                  <p>Are you sure you want to {selectedUser.status === 'active' ? 'suspend' : 'reactivate'} user <strong>{selectedUser.name}</strong>?</p>
-                )}
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowConfirm(false)}>Cancel</button>
-                <button type="button" className="btn btn-danger" onClick={handleConfirm}>Confirm</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        {/* PROJECTS */}
+        <Tab eventKey="projects" title="Projects">
+          <Row className="g-4 mt-3">
+            {projects.map(p => (
+              <Col md={4} key={p._id}>
+                <Card className="shadow-sm rounded-4 p-3 h-100">
+                  <Card.Body>
+                    <Card.Title className="fw-bold">{p.title}</Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">
+                      Client: {p.clientName || p.clientId?.name || p.clientId?._id}
+                    </Card.Subtitle>
+                    <p className="mt-3">
+                      <strong>Budget:</strong> ${p.budget}
+                    </p>
+                    <p className="text-muted mt-2">
+                      <small>Posted on: {new Date(p.createdAt).toLocaleDateString()}</small>
+                    </p>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Tab>
 
-      {/* Edit Modal */}
-      {showEditModal && editUserData && (
-        <div className="modal show d-block" tabIndex="-1" role="dialog" style={{backgroundColor:'rgba(0,0,0,0.5)'}}>
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit User</h5>
-                <button type="button" className="btn-close" onClick={() => setShowEditModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <label className="form-label">Name</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={editUserData.name}
-                    onChange={(e) => setEditUserData({...editUserData, name: e.target.value})}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Email</label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    value={editUserData.email}
-                    onChange={(e) => setEditUserData({...editUserData, email: e.target.value})}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Role</label>
-                  <select
-                    className="form-select"
-                    value={editUserData.role}
-                    onChange={(e) => setEditUserData({...editUserData, role: e.target.value})}
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
-                <button type="button" className="btn btn-primary" onClick={saveEdit}>Save</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        {/* APPLICATIONS */}
+        <Tab eventKey="applications" title="Applications">
+          <Row className="g-4 mt-3">
+            {applications.map(app => (
+              <Col md={4} key={app._id}>
+                <Card className="shadow-sm rounded-4 p-3 h-100">
+                  <Card.Body>
+                    <Card.Title>
+                      {app.freelancerName || app.freelancerId?.name || app.freelancerId?._id}
+                    </Card.Title>
+                    <Card.Subtitle className="mb-2 text-muted">
+                      Project: {app.projectTitle || app.projectId?.title || app.projectId?._id}
+                    </Card.Subtitle>
+                    <p className="mb-1"><strong>Bid:</strong> ${app.bidAmount}</p>
+                    <p className="text-muted mt-2">
+                      <small>Applied on: {new Date(app.createdAt).toLocaleDateString()}</small>
+                    </p>
+                    <Badge bg="secondary">{app.status}</Badge>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Tab>
 
-    </div>
+        <Tab eventKey="announcements" title="Announcements">
+          <AnnouncementPanel />
+        </Tab>
+      </Tabs>
+    </Container>
   );
-}
+};
 
 export default AdminDashboard;

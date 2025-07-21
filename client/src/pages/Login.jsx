@@ -47,9 +47,17 @@ const Login = () => {
 
     try {
       const res = await loginUser(form);
-      login(res.data.user, res.data.token);
-      localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
+      const { user, token } = res.data;
+
+      login(user, token); // Store user in context
+      localStorage.setItem("token", token);
+
+      // 🔁 Redirect based on user role
+      if (user.role === "admin") {
+        navigate("/dashboard/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError("Login failed. Check your credentials.");
     } finally {

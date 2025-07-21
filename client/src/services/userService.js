@@ -53,3 +53,7 @@ export const getFreelancerById = async (id, token) => {
   return await res.json();
 };
 
+export const getSystemAnnouncementForUser = async () => {
+  const res = await axios.get(`${API_URL}/announcement`);
+  return res.data;
+};

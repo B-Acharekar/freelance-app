@@ -1,6 +1,8 @@
 import { Container, Row, Col, Card, Badge } from "react-bootstrap";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getSystemAnnouncementForUser } from "../services/userService";
 import {
   FaPlus,
   FaSearch,
@@ -8,17 +10,33 @@ import {
   FaClipboardList,
   FaUserCircle,
   FaComments,
+  FaBullhorn,
 } from "react-icons/fa";
 import Notifications from "../components/Notifications";
 import PortfolioUploader from "../components/PortfolioUploader";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const [announcement, setAnnouncement] = useState("");
+
+  useEffect(() => {
+    const fetchAnnouncement = async () => {
+      try {
+        const data = await getSystemAnnouncementForUser();
+        if (data?.message) {
+          setAnnouncement(data.message);
+        }
+      } catch (error) {
+        console.error("Failed to fetch announcement", error);
+      }
+    };
+    fetchAnnouncement();
+  }, []);
 
   return (
     <Container className="py-5">
       {/* Welcome Banner */}
-      <Card className="mb-5 border-0 shadow-sm rounded-4 bg-gradient-lightblue">
+      <Card className="mb-4 border-0 shadow-sm rounded-4 bg-gradient-lightblue">
         <Card.Body className="d-flex justify-content-between align-items-center flex-wrap">
           <div>
             <h2 className="fw-bold mb-1 text-primary">
@@ -35,6 +53,19 @@ const Dashboard = () => {
           </div>
         </Card.Body>
       </Card>
+
+      {/* System Announcement */}
+      {announcement && (
+        <Card className="mb-5 shadow-sm border-0 rounded-4 bg-light">
+          <Card.Body className="d-flex align-items-start gap-3">
+            <FaBullhorn size={24} className="text-warning mt-1" />
+            <div>
+              <h5 className="text-dark fw-bold mb-1">System Announcement</h5>
+              <p className="mb-0 text-muted">{announcement}</p>
+            </div>
+          </Card.Body>
+        </Card>
+      )}
 
       {/* Quick Actions Section */}
       <h4 className="fw-semibold mb-4 text-uppercase text-secondary">
@@ -116,28 +147,6 @@ const Dashboard = () => {
           link={`/profile/${user._id}`}
         />
       </Row>
-
-      <h4 className="fw-semibold mt-5 mb-4 text-uppercase text-secondary">
-        Testing section...
-      </h4>
-      <Row>
-        <ActionCard
-          title="Admin Control"
-          text="Manage website"
-          icon={<FaUserCircle className="me-3 text-secondary" />}
-          btnText="Go to Admin Dashboard"
-          btnVariant="secondary"
-          link={`/dashboard/admin`}
-        />
-        <div className="my-5">
-          <Notifications />
-
-        </div>
-        <div className="my-5">
-          <PortfolioUploader />
-
-        </div>
-      </Row>
     </Container>
   );
 };
@@ -160,8 +169,7 @@ const ActionCard = ({
         <Card.Text className="text-muted flex-grow-1">{text}</Card.Text>
         <Link
           to={link}
-          className={`btn btn-${btnVariant} w-100 mt-4 rounded-pill fw-semibold ${textWhite ? "text-white" : ""
-            }`}
+          className={`btn btn-${btnVariant} w-100 mt-4 rounded-pill fw-semibold ${textWhite ? "text-white" : ""}`}
           style={{ boxShadow: "0 4px 8px rgb(0 0 0 / 0.1)" }}
         >
           {btnText}

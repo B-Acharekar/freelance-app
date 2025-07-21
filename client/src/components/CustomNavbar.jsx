@@ -30,7 +30,7 @@ const CustomNavbar = () => {
       <Container fluid>
         <Navbar.Brand
           as={Link}
-          to="/"
+          to={user ? (user.role === "admin" ? "/dashboard/admin" : "/dashboard") : "/"}
           className="fw-bold fs-4 text-white d-flex align-items-center"
           style={{ letterSpacing: "0.05em" }}
         >
@@ -134,14 +134,16 @@ const CustomNavbar = () => {
               </>
             ) : (
               <>
-                <Nav.Link
-                  as={NavLink}
-                  to="/dashboard"
-                  className="text-white fw-semibold nav-link-hover"
-                  style={{ paddingTop: 6, paddingBottom: 6 }}
-                >
-                  Dashboard
-                </Nav.Link>
+                {user && user.role !== "admin" && (
+                  <Nav.Link
+                    as={NavLink}
+                    to="/dashboard"
+                    className="text-white fw-semibold nav-link-hover"
+                    style={{ paddingTop: 6, paddingBottom: 6 }}
+                  >
+                    Dashboard
+                  </Nav.Link>
+                )}
                 <Button
                   variant="light"
                   size="sm"

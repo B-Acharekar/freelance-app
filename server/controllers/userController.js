@@ -1,4 +1,14 @@
 import User from "../models/Users.js";
+import Announcement from '../models/Announcement.js';
+
+export const getAnnouncement = async (req, res) => {
+  try {
+    const announcement = await Announcement.findOne();
+    res.status(200).json(announcement || {});
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get announcement' });
+  }
+};
 
 export const getUserProfile = async (req, res) => {
   try {

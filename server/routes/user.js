@@ -2,6 +2,7 @@ import express from 'express';
 import { verifyToken } from '../middlewares/verifyToken.js';
 import {
   getUserProfile,
+  getAnnouncement,
   updateFreelancerProfile,
   updateClientProfile,
   getFreelancers,
@@ -25,6 +26,7 @@ router.put(
   updateFreelancerProfile
 );
 router.put('/client', verifyToken, updateClientProfile);
+router.get('/announcement', getAnnouncement);
 router.get('/', verifyToken, getFreelancers); // All freelancers
 router.get('/freelancer/:id', verifyToken, getFreelancerById);
 

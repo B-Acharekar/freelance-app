@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema(
       { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
     ],
     funds: { type: Number, default: 0 },
+    isBlocked: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
