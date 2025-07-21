@@ -10,6 +10,7 @@ import projectRoutes from "./routes/projectRoutes.js";
 import applicationRoutes from "./routes/applications.js";
 import chatRoutes from "./routes/chat.js";
 import userRoutes from "./routes/user.js";
+import uploadRoutes from "./routes/upload.js"
 import SocketHandler from "./sockets/chatSocket.js";
 
 dotenv.config();
@@ -41,6 +42,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/uploads",uploadRoutes);
 
 connectDB();
 

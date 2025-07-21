@@ -1,17 +1,17 @@
-import User from '../models/Users.js';
+import User from "../models/Users.js";
 
 export const getUserProfile = async (req, res) => {
   try {
     const userId = req.user.id; // use token data
     console.log("User from token:", req.user);
 
-    const user = await User.findById(userId).select('-password');
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const user = await User.findById(userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json(user);
   } catch (err) {
     console.error("Error fetching profile:", err.message);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -39,7 +39,13 @@ export const updateFreelancerProfile = async (req, res) => {
     if (!user) return res.status(404).json({ error: "User not found" });
 
     if (user.role !== "freelancer") {
-      return res.status(403).json({ error: "Only freelancers can update this section" });
+      return res
+        .status(403)
+        .json({ error: "Only freelancers can update this section" });
+    }
+
+    if (!Array.isArray(user.skills)) {
+      return res.status(400).json({ error: "Skills must be an array" });
     }
 
     user.skills = skills;
@@ -58,14 +64,14 @@ export const updateFreelancerProfile = async (req, res) => {
 // PUT: Update client profile
 export const updateClientProfile = async (req, res) => {
   try {
-    if (req.user.role !== 'client') {
-      return res.status(403).json({ message: 'Access denied' });
+    if (req.user.role !== "client") {
+      return res.status(403).json({ message: "Access denied" });
     }
 
     const updates = req.body;
     const updatedUser = await User.findByIdAndUpdate(req.user.id, updates, {
       new: true,
-    }).select('-password');
+    }).select("-password");
 
     res.status(200).json(updatedUser);
   } catch (err) {
@@ -76,7 +82,9 @@ export const updateClientProfile = async (req, res) => {
 // GET: All freelancers
 export const getFreelancers = async (req, res) => {
   try {
-    const freelancers = await User.find({ role: 'freelancer' }).select('-password');
+    const freelancers = await User.find({ role: "freelancer" }).select(
+      "-password"
+    );
     res.status(200).json(freelancers);
   } catch (err) {
     res.status(500).json({ message: err.message });

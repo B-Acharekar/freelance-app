@@ -10,6 +10,7 @@ import {
   FaComments,
 } from "react-icons/fa";
 import Notifications from "../components/Notifications";
+import PortfolioUploader from "../components/PortfolioUploader";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -117,7 +118,7 @@ const Dashboard = () => {
       </Row>
 
       <h4 className="fw-semibold mt-5 mb-4 text-uppercase text-secondary">
-       Testing section...
+        Testing section...
       </h4>
       <Row>
         <ActionCard
@@ -129,7 +130,11 @@ const Dashboard = () => {
           link={`/dashboard/admin`}
         />
         <div className="my-5">
-        <Notifications/>
+          <Notifications />
+
+        </div>
+        <div className="my-5">
+          <PortfolioUploader />
 
         </div>
       </Row>
