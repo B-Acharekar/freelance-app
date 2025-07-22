@@ -1,8 +1,11 @@
-import { Card, Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { FaExternalLinkAlt, FaFileDownload } from "react-icons/fa";
+import {Card, Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { FaExternalLinkAlt, FaFileDownload,FaEdit  } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import DeleteApplicationButton from "./DeleteApplicationButton";
 
-const ApplicationCard = ({ app }) => {
+const ApplicationCard = ({ app,onDelete  }) => {
   const {
+    _id,
     projectTitle,
     projectDescription,
     bidAmount,
@@ -95,6 +98,18 @@ const ApplicationCard = ({ app }) => {
             day: "numeric",
           })}
         </Card.Text>
+
+        {/* Action Buttons */}
+        <div className="d-flex mt-3 gap-2">
+          <Link
+            to={`/applications/edit/${_id}`}
+            className="btn btn-outline-primary btn-sm rounded-pill d-inline-flex align-items-center gap-1"
+          >
+            <FaEdit size={14} /> Edit
+          </Link>
+
+          <DeleteApplicationButton applicationId={_id} onDelete={onDelete} />
+        </div>
       </Card.Body>
     </Card>
   );

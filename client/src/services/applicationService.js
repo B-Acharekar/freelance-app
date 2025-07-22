@@ -26,3 +26,18 @@ export const updateApplicationStatus = (id, status, token) =>
   API.patch(`/${id}/status`, { status }, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const updateMyApplication = (id, updatedData, token) =>
+  API.patch(`/${id}`, updatedData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const deleteMyApplication = (id, token) =>
+  API.delete(`/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const fetchApplicationById = (id, token) =>
+  API.get(`/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });

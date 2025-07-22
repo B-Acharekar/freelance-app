@@ -21,6 +21,7 @@ import FloatingBackButton from "./components/FloatingBackButton";
 import ChatPage from "./pages/ChatPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import EditProject from "./pages/EditProject";
+import EditApplication from "./pages/EditApplication";
 
 function App() {
   return (
@@ -94,6 +95,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['freelancer']}>
                 <ApplyForProjectWrapper />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/applications/edit/:projectId"
+            element={
+              <ProtectedRoute allowedRoles={['freelancer']}>
+                <EditApplication />
               </ProtectedRoute>
             }
           />

@@ -114,3 +114,64 @@ export const updateApplicationStatus = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const updateApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { coverLetter, bidAmount, portfolioLink, portfolioFile } = req.body;
+
+    const application = await Application.findById(id);
+    if (!application) return res.status(404).json({ message: "Application not found" });
+
+    if (application.freelancerId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    application.coverLetter = coverLetter || application.coverLetter;
+    application.bidAmount = bidAmount || application.bidAmount;
+    application.portfolioLink = portfolioLink || application.portfolioLink;
+    application.portfolioFile = portfolioFile || application.portfolioFile;
+
+    await application.save();
+    res.json({ message: "Application updated successfully", application });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const deleteApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const application = await Application.findById(id);
+    if (!application) return res.status(404).json({ message: "Application not found" });
+
+    if (application.freelancerId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    await application.deleteOne();
+    res.json({ message: "Application deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getApplicationById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const application = await Application.findById(id).populate("projectId", "title description");
+    if (!application) return res.status(404).json({ message: "Application not found" });
+
+    // Check if current user is the freelancer who created it
+    if (application.freelancerId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    res.json(application);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

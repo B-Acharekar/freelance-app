@@ -35,6 +35,11 @@ export default function MyApplications() {
     fetchApps();
   }, [token]);
 
+  const handleDelete = (deletedId) => {
+    setApplications((prev) => prev.filter((app) => app._id !== deletedId));
+  };
+
+
   return (
     <Container className="py-5">
       <div className="text-center mb-5">
@@ -67,7 +72,7 @@ export default function MyApplications() {
       <Row className="g-4">
         {applications.map((app) => (
           <Col key={app._id} xs={12} sm={6} lg={4}>
-            <ApplicationCard app={app} />
+            <ApplicationCard app={app} onDelete={handleDelete} />
           </Col>
         ))}
       </Row>
