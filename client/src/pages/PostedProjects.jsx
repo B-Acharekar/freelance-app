@@ -2,35 +2,80 @@ import React, { useEffect, useState } from 'react';
 import { getPostedProjects } from '../services/projectService';
 import { fetchApplicationsByProject } from '../services/applicationService';
 import { NavLink } from 'react-router-dom';
-import { Card, Container, ListGroup, Button, Badge, Row, Col } from 'react-bootstrap';
-import { FaComments, FaBriefcase, FaUserTie, FaPen } from 'react-icons/fa';
+import {
+  Card,
+  Container,
+  ListGroup,
+  Button,
+  Badge,
+  Row,
+  Col,
+  Spinner,
+  Form,
+} from 'react-bootstrap';
+import { FaComments, FaBriefcase, FaUserTie, FaPen, FaSearch } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import DeleteProjectButton from '../components/DeleteProjectButton';
+import UniversalAlert from '../components/UniversalAlert';
 
 const PostedProjects = () => {
   const [postedProjects, setPostedProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
   const [applicationsMap, setApplicationsMap] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
   const { token, user } = useAuth();
 
   useEffect(() => {
     const fetchProjectsAndApps = async () => {
+      setLoading(true);
       try {
         const res = await getPostedProjects(token);
         setPostedProjects(res.data);
+        setFilteredProjects(res.data);
 
-        const allApplications = {};
+        const apps = {};
         for (const project of res.data) {
-          const appsRes = await fetchApplicationsByProject(project._id, token);
-          allApplications[project._id] = appsRes.data;
+          const appRes = await fetchApplicationsByProject(project._id, token);
+          apps[project._id] = appRes.data;
         }
-        setApplicationsMap(allApplications);
+        setApplicationsMap(apps);
       } catch (err) {
-        console.error("Failed to load posted projects or applications", err);
+        console.error('Failed to load posted projects or applications', err);
+        setError('Failed to load your posted projects. Please try again later.');
+        setShowError(true);
+      } finally {
+        setLoading(false);
       }
     };
 
     if (token) fetchProjectsAndApps();
   }, [token]);
+
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+
+    const filtered = postedProjects.filter((project) => {
+      const text = `${project.title} ${project.description}`.toLowerCase();
+      return text.includes(term);
+    });
+
+    setFilteredProjects(filtered);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setFilteredProjects(postedProjects);
+  };
+
+  const handleDelete = (deletedId) => {
+    const updated = postedProjects.filter((proj) => proj._id !== deletedId);
+    setPostedProjects(updated);
+    setFilteredProjects(updated);
+  };
 
   if (!user || user.role !== 'client') {
     return (
@@ -42,16 +87,54 @@ const PostedProjects = () => {
   }
 
   return (
-    <Container className="my-5">
-      <h2 className="mb-4 fw-bold text-primary">
-        <FaBriefcase className="me-2" />
-        Your Posted Projects
-      </h2>
+    <Container className="my-5" style={{ maxWidth: '1140px' }}>
+      <div className="text-center mb-4">
+        <h2 className="fw-bold text-primary">Your Posted Projects</h2>
+      </div>
 
-      {postedProjects.length === 0 ? (
-        <p className="text-muted">You haven't posted any projects yet.</p>
+      <Form className="mb-4">
+        <Form.Group className="position-relative">
+          <Form.Control
+            type="text"
+            placeholder="Search projects by title or description..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="rounded-pill ps-4 pe-5 border-0 shadow-sm bg-light"
+          />
+          {searchTerm && (
+            <button
+              onClick={clearSearch}
+              type="button"
+              className="btn btn-sm bg-transparent border-0 text-muted position-absolute top-50 translate-middle-y end-0 me-5"
+              aria-label="Clear search"
+            >
+              <span className="fs-5 fw-bold">×</span>
+            </button>
+          )}
+          <FaSearch className="position-absolute top-50 translate-middle-y end-0 me-3 text-secondary opacity-75" />
+        </Form.Group>
+      </Form>
+
+      <UniversalAlert
+        variant="error"
+        show={showError}
+        onClose={() => setShowError(false)}
+      >
+        {error}
+      </UniversalAlert>
+
+      {loading ? (
+        <div className="text-center my-5" aria-busy="true">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-2 fw-semibold text-primary">Loading your posted projects...</p>
+        </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="text-center text-muted py-5">
+          <h5>No matching projects found</h5>
+          <p>Try different keywords or clear the search input.</p>
+        </div>
       ) : (
-        postedProjects.map((project) => (
+        filteredProjects.map((project) => (
           <Card key={project._id} className="mb-4 border-0 shadow-sm rounded-4 p-3">
             <Card.Body>
               <Row className="align-items-center mb-3">
@@ -73,15 +156,11 @@ const PostedProjects = () => {
                   </NavLink>
                   <DeleteProjectButton
                     projectId={project._id}
-                    onDelete={(deletedId) => {
-                      setPostedProjects((prev) =>
-                        prev.filter((proj) => proj?._id && proj._id !== deletedId)
-                      );
-                    }}
+                    onDelete={handleDelete}
                   />
                   <NavLink
                     to={`/applications/project/${project._id}`}
-                    className="btn btn-sm btn-outline-primary rounded-pill"
+                    className="btn btn-sm btn-outline-primary rounded-pill mt-2 mt-md-0"
                   >
                     View All
                   </NavLink>
