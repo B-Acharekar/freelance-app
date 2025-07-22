@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { createProject } from "../services/projectService";
+import { createProject, updateProject } from "../services/projectService";
 import InfoCard from "../components/InfoCard";
 import {
   Form,
@@ -16,7 +16,7 @@ import {
   FaTools,
 } from "react-icons/fa";
 
-const ProjectForm = ({ onSuccess }) => {
+const ProjectForm = ({ onSuccess, initialData = null, projectId = null }) => {
   const { token } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -25,6 +25,15 @@ const ProjectForm = ({ onSuccess }) => {
     budget: "",
     skillsRequired: "",
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        ...initialData,
+        skillsRequired: initialData.skillsRequired?.join(", ") || "",
+      });
+    }
+  }, [initialData]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -35,32 +44,32 @@ const ProjectForm = ({ onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const body = {
-        ...formData,
-        skillsRequired: formData.skillsRequired
-          .split(",")
-          .map((skill) => skill.trim()),
-      };
+    const body = {
+      ...formData,
+      skillsRequired: formData.skillsRequired
+        .split(",")
+        .map((s) => s.trim()),
+    };
 
-      await createProject(body, token);
-      setFormData({ title: "", description: "", budget: "", skillsRequired: "" });
+    try {
+      if (projectId) {
+        await updateProject(projectId, body, token);
+      } else {
+        await createProject(body, token);
+      }
       onSuccess?.();
     } catch (error) {
-      console.error("Failed to post project:", error);
-      // Errors handled outside, so no local alert here
+      console.error("Failed to submit project:", error);
     }
   };
 
   return (
-    <InfoCard title="Post a New Project">
+    <InfoCard title={projectId ? "Edit Project" : "Post a New Project"}>
       <Form onSubmit={handleSubmit} noValidate>
         <Form.Group className="mb-4" controlId="projectTitle">
           <Form.Label className="fw-semibold">Project Title</Form.Label>
           <InputGroup>
-            <InputGroup.Text>
-              <FaHeading />
-            </InputGroup.Text>
+            <InputGroup.Text><FaHeading /></InputGroup.Text>
             <Form.Control
               type="text"
               name="title"
@@ -75,9 +84,7 @@ const ProjectForm = ({ onSuccess }) => {
         <Form.Group className="mb-4" controlId="projectDescription">
           <Form.Label className="fw-semibold">Project Description</Form.Label>
           <InputGroup>
-            <InputGroup.Text>
-              <FaFileAlt />
-            </InputGroup.Text>
+            <InputGroup.Text><FaFileAlt /></InputGroup.Text>
             <Form.Control
               as="textarea"
               rows={4}
@@ -96,9 +103,7 @@ const ProjectForm = ({ onSuccess }) => {
             <Form.Group controlId="projectBudget">
               <Form.Label className="fw-semibold">Budget ($)</Form.Label>
               <InputGroup>
-                <InputGroup.Text>
-                  <FaDollarSign />
-                </InputGroup.Text>
+                <InputGroup.Text><FaDollarSign /></InputGroup.Text>
                 <Form.Control
                   type="number"
                   name="budget"
@@ -116,9 +121,7 @@ const ProjectForm = ({ onSuccess }) => {
             <Form.Group controlId="projectSkills">
               <Form.Label className="fw-semibold">Skills Required</Form.Label>
               <InputGroup>
-                <InputGroup.Text>
-                  <FaTools />
-                </InputGroup.Text>
+                <InputGroup.Text><FaTools /></InputGroup.Text>
                 <Form.Control
                   type="text"
                   name="skillsRequired"
@@ -133,12 +136,12 @@ const ProjectForm = ({ onSuccess }) => {
         </Row>
 
         <Button
-          variant="success"
+          variant={projectId ? "primary" : "success"}
           type="submit"
           className="w-100 rounded-pill shadow-sm fw-semibold py-2"
           size="lg"
         >
-          Post Project
+          {projectId ? "Update Project" : "Post Project"}
         </Button>
       </Form>
     </InfoCard>

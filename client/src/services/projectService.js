@@ -21,3 +21,9 @@ export const fetchProjectById = (id) =>
 // ✅ Add this function to get posted projects by the logged-in client
 export const getPostedProjects = (token) =>
   API.get('/projects/my-posted-projects', authHeader(token));
+
+export const updateProject = (id, projectData, token) =>
+  API.put(`/projects/${id}`, projectData, authHeader(token));
+
+export const deleteProject = (id, token) =>
+  API.delete(`/projects/${id}`, authHeader(token));

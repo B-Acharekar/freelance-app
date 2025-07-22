@@ -3,8 +3,9 @@ import { getPostedProjects } from '../services/projectService';
 import { fetchApplicationsByProject } from '../services/applicationService';
 import { NavLink } from 'react-router-dom';
 import { Card, Container, ListGroup, Button, Badge, Row, Col } from 'react-bootstrap';
-import { FaComments, FaBriefcase, FaUserTie } from 'react-icons/fa';
+import { FaComments, FaBriefcase, FaUserTie, FaPen } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import DeleteProjectButton from '../components/DeleteProjectButton';
 
 const PostedProjects = () => {
   const [postedProjects, setPostedProjects] = useState([]);
@@ -51,51 +52,62 @@ const PostedProjects = () => {
         <p className="text-muted">You haven't posted any projects yet.</p>
       ) : (
         postedProjects.map((project) => (
-          <Card key={project._id} className="mb-4 border-0 shadow-sm rounded-4">
+          <Card key={project._id} className="mb-4 border-0 shadow-sm rounded-4 p-3">
             <Card.Body>
-              <Row className="align-items-center">
+              <Row className="align-items-center mb-3">
                 <Col md={9}>
-                  <h4 className="fw-semibold mb-2">
+                  <h4 className="fw-bold mb-1">
                     {project.title}{' '}
-                    <Badge bg="secondary" className="ms-2">
+                    <Badge bg="info" pill className="ms-2">
                       {applicationsMap[project._id]?.length || 0} Applicants
                     </Badge>
                   </h4>
-                  <p className="text-muted">{project.description}</p>
+                  <p className="text-muted mb-0">{project.description}</p>
                 </Col>
-
                 <Col md={3} className="text-md-end mt-3 mt-md-0">
                   <NavLink
-                    to={`/applications/project/${project._id}`}
-                    className="btn btn-outline-primary btn-sm rounded-pill fw-semibold"
+                    to={`/projects/edit/${project._id}`}
+                    className="btn btn-sm btn-outline-secondary rounded-pill me-2"
                   >
-                    View All Applicants
+                    <FaPen className="me-1" /> Edit
+                  </NavLink>
+                  <DeleteProjectButton
+                    projectId={project._id}
+                    onDelete={(deletedId) => {
+                      setPostedProjects((prev) =>
+                        prev.filter((proj) => proj?._id && proj._id !== deletedId)
+                      );
+                    }}
+                  />
+                  <NavLink
+                    to={`/applications/project/${project._id}`}
+                    className="btn btn-sm btn-outline-primary rounded-pill"
+                  >
+                    View All
                   </NavLink>
                 </Col>
               </Row>
 
-              {/* Applicants List */}
-              <hr />
-              <h6 className="text-muted mb-3">Recent Applicants:</h6>
+              <hr className="my-3" />
+              <h6 className="text-muted fw-semibold mb-3">Recent Applicants</h6>
 
               {applicationsMap[project._id]?.length > 0 ? (
                 <ListGroup variant="flush">
                   {applicationsMap[project._id].map((app) => (
                     <ListGroup.Item
                       key={app._id}
-                      className="d-flex justify-content-between align-items-center"
+                      className="d-flex justify-content-between align-items-center px-0 border-bottom py-2"
                     >
                       <div>
-                        <div className="fw-bold">
+                        <div className="fw-semibold">
                           <FaUserTie className="me-2 text-secondary" />
                           {app.freelancerName || app.freelancerId?.name || 'Unnamed Freelancer'}
                         </div>
                         <div className="text-muted small">{app.coverLetter}</div>
                       </div>
-
                       <NavLink
                         to={`/chatroom/${app.freelancerId}/${project._id}`}
-                        className="btn btn-sm btn-outline-dark rounded-pill"
+                        className="btn btn-outline-dark btn-sm rounded-pill"
                       >
                         <FaComments className="me-1" />
                         Message

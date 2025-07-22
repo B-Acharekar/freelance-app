@@ -20,6 +20,7 @@ import ChatList from './components/ChatList';
 import FloatingBackButton from "./components/FloatingBackButton";
 import ChatPage from "./pages/ChatPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import EditProject from "./pages/EditProject";
 
 function App() {
   return (
@@ -42,7 +43,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           <Route
             path="/dashboard/admin"
             element={
@@ -66,6 +67,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['client', 'freelancer']}>
                 <BrowseProjects />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/projects/edit/:projectid"
+            element={
+              <ProtectedRoute allowedRoles={['client']}>
+                <EditProject />
               </ProtectedRoute>
             }
           />
