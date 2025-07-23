@@ -96,6 +96,15 @@ const CustomNavbar = () => {
                   <FaUserCircle />
                   My Applications
                 </Nav.Link>
+
+                <Nav.Link
+                  as={NavLink}
+                  to="/projects/active"
+                  className="text-white d-flex align-items-center gap-1 nav-link-hover"
+                >
+                  <FaUserCircle />
+                  My work
+                </Nav.Link>
               </>
             )}
 

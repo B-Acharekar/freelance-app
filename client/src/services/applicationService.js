@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/applications", 
+  baseURL: "http://localhost:5000/api/applications",
 });
 
 // Apply for a project
@@ -23,9 +23,13 @@ export const fetchMyApplications = (token) =>
   });
 
 export const updateApplicationStatus = (id, status, token) =>
-  API.patch(`/${id}/status`, { status }, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  API.patch(
+    `/${id}/status`,
+    { status },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 
 export const updateMyApplication = (id, updatedData, token) =>
   API.patch(`/${id}`, updatedData, {
@@ -41,3 +45,8 @@ export const fetchApplicationById = (id, token) =>
   API.get(`/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const makeBid = async (projectId) => {
+  const res = await axios.post("/make-bid", { projectId });
+  return res.data;
+};

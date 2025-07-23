@@ -27,6 +27,7 @@ const ApplicationCard = ({ app, onDelete }) => {
         return "secondary";
     }
   };
+  const isAccepted = (status === "accepted");
 
   return (
     <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden position-relative">
@@ -98,6 +99,7 @@ const ApplicationCard = ({ app, onDelete }) => {
           })}
         </Card.Text>
 
+        {!isAccepted &&(
         <div className="d-flex gap-2 mt-3">
           <Link
             to={`/applications/edit/${_id}`}
@@ -108,6 +110,7 @@ const ApplicationCard = ({ app, onDelete }) => {
 
           <DeleteApplicationButton applicationId={_id} onDelete={onDelete} />
         </div>
+        )}
       </Card.Body>
     </Card>
   );

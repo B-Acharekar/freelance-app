@@ -5,30 +5,66 @@ import User from "../models/Users.js";
 
 export const createApplication = async (req, res) => {
   try {
-    const { coverLetter, bidAmount, portfolioLink, portfolioFile } = req.body;
+    const { coverLetter, bidAmount, portfolioLink, portfolioFile, estimatedTime } = req.body;
     const projectId = req.params.projectId;
-    const user = await User.findById(req.user.id);
 
-    if (!user || user.role !== "freelancer") {
+    const freelancer = await User.findById(req.user.id);
+    const project = await Project.findById(projectId);
+
+    if (!freelancer || freelancer.role !== "freelancer") {
       return res.status(403).json({ message: "Only freelancers can apply" });
+    }
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
     }
 
     if (!portfolioFile) {
       return res.status(400).json({ message: "Portfolio file is required." });
     }
 
+    const client = await User.findById(project.clientId);
+    if (!client) {
+      return res.status(404).json({ message: "Client not found" });
+    }
+
     const application = new Application({
       projectId,
-      freelancerId: req.user.id,
+      clientId: client._id,
+      clientName: client.name,
+      clientEmail: client.email,
+      freelancerId: freelancer._id,
+      freelancerName: freelancer.name,
+      freelancerEmail: freelancer.email,
+      freelancerSkills: freelancer.skills || [],
+      title: project.title,
+      description: project.description,
+      budget: project.budget,
+      requiredSkills: project.skillsRequired || [],
       coverLetter,
       bidAmount,
+      estimatedTime,
       portfolioLink,
       portfolioFile,
     });
 
     await application.save();
+
+    // Update project with bid data
+    project.bids = project.bids || [];
+    project.bidAmounts = project.bidAmounts || [];
+    project.bids.push(freelancer._id);
+    project.bidAmounts.push(parseInt(bidAmount));
+    await project.save();
+
+    // Update freelancer's application list
+    freelancer.applications = freelancer.applications || [];
+    freelancer.applications.push(application._id);
+    await freelancer.save();
+
     res.status(201).json({ message: "Application submitted", application });
   } catch (err) {
+    console.error("Application creation error:", err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -108,6 +144,17 @@ export const updateApplicationStatus = async (req, res) => {
     application.status = status;
     await application.save();
 
+    if (status === "accepted") {
+      const freelancer = await User.findById(application.freelancerId);
+      const projectId = application.projectId._id;
+
+      // Only add if not already added
+      if (!freelancer.currentProjects.includes(projectId)) {
+        freelancer.currentProjects.push(projectId);
+        await freelancer.save();
+      }
+    }
+
     res.json({ message: `Application ${status}` });
   } catch (err) {
     console.error("Update application status error:", err);
@@ -174,4 +221,3 @@ export const getApplicationById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-

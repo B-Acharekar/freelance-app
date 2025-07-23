@@ -50,6 +50,24 @@ const Dashboard = () => {
             <p className="mb-0 text-muted fs-6">
               Here’s a quick overview of your activity.
             </p>
+            <div className="mt-3">
+              {user?.role === "freelancer" && (
+                <>
+                  <p className="mb-1 text-muted fs-6">
+                    <strong>Funds:</strong> ${user?.funds}
+                  </p>
+                  <p className="mb-1 text-muted fs-6">
+                    <strong>Current Projects:</strong> {user?.currentProjects?.length}
+                  </p>
+                  <p className="mb-1 text-muted fs-6">
+                    <strong>Completed Projects:</strong> {user?.completedProjects?.length}
+                  </p>
+                  <p className="mb-1 text-muted fs-6">
+                    <strong>Applications:</strong> {user?.applications?.length}
+                  </p>
+                </>
+              )}
+            </div>
           </div>
         </Card.Body>
       </Card>

@@ -1,4 +1,5 @@
 import Project from "../models/Project.js";
+import User from "../models/Users.js";
 
 // Create a new project (Client only)
 export const createProject = async (req, res) => {
@@ -90,17 +91,83 @@ export const deleteProjectById = async (req, res) => {
     const project = await Project.findById(id);
 
     if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
+      return res.status(404).json({ message: "Project not found" });
     }
 
     // Optional: check ownership
     if (project.clientId.toString() !== userId) {
-      return res.status(403).json({ message: 'Unauthorized to delete this project' });
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to delete this project" });
     }
 
     await project.deleteOne();
-    res.status(200).json({ message: 'Project deleted successfully' });
+    res.status(200).json({ message: "Project deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+export const getMyActiveProjects = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const applications = await Application.find({
+      freelancerId: userId,
+      status: "accepted",
+    }).populate("projectId");
+
+    const projects = applications.map((app) => ({
+      _id: app.projectId._id,
+      title: app.projectId.title,
+      description: app.projectId.description,
+      budget: app.bidAmount, // custom: use bid amount
+    }));
+
+    res.status(200).json(projects);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load freelancer projects" });
+  }
+};
+
+export const completeProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    if (project.status === "completed") {
+      return res.status(400).json({ message: "Project is already completed" });
+    }
+
+    // Mark as completed
+    project.status = "completed";
+    await project.save();
+
+    const freelancer = await User.findById(project.assignedFreelancer);
+    if (!freelancer) {
+      return res.status(404).json({ message: "Freelancer not found" });
+    }
+
+    // Pay the freelancer (add funds)
+    freelancer.funds = (freelancer.funds || 0) + (project.budget || 0);
+
+    // Move from currentProjects → completedProjects
+    freelancer.currentProjects = freelancer.currentProjects.filter(
+      (id) => id.toString() !== project._id.toString()
+    );
+    freelancer.completedProjects.push(project._id);
+
+    await freelancer.save();
+
+    res
+      .status(200)
+      .json({ message: "Project marked completed and freelancer paid." });
+  } catch (err) {
+    console.error("Error completing project:", err);
+    res.status(500).json({ error: err.message });
   }
 };

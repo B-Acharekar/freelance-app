@@ -7,6 +7,8 @@ import {
   getMyPostedProjects,
   updateProject,
   deleteProjectById,
+  completeProject,
+  getMyActiveProjects,
 } from '../controllers/projectController.js';
 import { verifyToken } from '../middlewares/verifyToken.js';
 import { validateRequest } from "../middlewares/validate.js";
@@ -31,5 +33,8 @@ router.get('/', getAllProjects);
 router.get('/:id', getProjectById);
 router.put('/:id', verifyToken, updateProject);
 router.delete('/:id', verifyToken, deleteProjectById);
+router.post("/my-active-projects", verifyToken, getMyActiveProjects);
+router.patch("/complete/:projectId", verifyToken, completeProject);
+
 
 export default router;

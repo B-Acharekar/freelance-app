@@ -22,6 +22,7 @@ import ChatPage from "./pages/ChatPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import EditProject from "./pages/EditProject";
 import EditApplication from "./pages/EditApplication";
+import MyFreelanceProjects from "./pages/MyFreelanceProjects";
 
 function App() {
   return (
@@ -59,6 +60,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['client']}>
                 <PostProject />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/projects/active"
+            element={
+              <ProtectedRoute allowedRoles={['freelancer']}>
+                <MyFreelanceProjects />
               </ProtectedRoute>
             }
           />

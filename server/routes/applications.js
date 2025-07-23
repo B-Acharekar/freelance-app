@@ -29,6 +29,6 @@ router.get("/my-applications", verifyToken, getMyApplications);
 router.patch("/:id/status", verifyToken, updateApplicationStatus);
 router.get("/:id", verifyToken, getApplicationById);
 router.patch("/:id", verifyToken, updateApplication);        
-router.delete("/:id", verifyToken, deleteApplication);         
+router.delete("/:id", verifyToken, deleteApplication); 
 
 export default router;
