@@ -85,7 +85,7 @@ export default function MyApplications() {
   };
 
   return (
-    <Container className="mt-5" style={{ maxWidth: "1140px" }}>
+    <Container className="mx-5" style={{ maxWidth: "1140px" }}>
       <h2 className="mb-4 fw-bold text-center text-primary">My Applications</h2>
 
       {/* Search Bar */}
