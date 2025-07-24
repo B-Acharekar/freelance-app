@@ -5,6 +5,7 @@ import { Container, Row, Col, Spinner, Form } from "react-bootstrap";
 import UniversalAlert from "../components/UniversalAlert";
 import { useAuth } from "../context/AuthContext";
 import { FaFolderOpen, FaSearch } from "react-icons/fa";
+import FilterSidebar from "../components/FilterSidebar";
 
 const BrowseProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -51,11 +52,42 @@ const BrowseProjects = () => {
     setFilteredProjects(projects);
   };
 
-  return (
-    <Container className="mt-5" style={{ maxWidth: "1140px" }}>
-      <h2 className="mb-4 fw-bold text-center text-primary">Browse Projects</h2>
+  const applyFilters = ({ selectedSkills, budgetRange }) => {
+    let filtered = [...projects];
 
-      <Form className="mb-4">
+    if (selectedSkills.length > 0) {
+      filtered = filtered.filter((proj) =>
+        selectedSkills.every((skill) =>
+          proj.skillsRequired?.includes(skill)
+        )
+      );
+    }
+
+    if (budgetRange.min || budgetRange.max) {
+      const min = parseFloat(budgetRange.min || 0);
+      const max = parseFloat(budgetRange.max || Infinity);
+      filtered = filtered.filter(
+        (proj) => proj.budget >= min && proj.budget <= max
+      );
+    }
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((proj) =>
+        `${proj.title} ${proj.description}`
+          .toLowerCase()
+          .includes(term)
+      );
+    }
+
+    setFilteredProjects(filtered);
+  };
+
+  return (
+    <Container fluid className="py-4 px-4">
+      <h2 className="fw-bold text-center text-primary mb-4">Browse Projects</h2>
+
+      <Form className="mb-4 mx-auto" style={{ maxWidth: "720px" }}>
         <Form.Group className="position-relative">
           <Form.Control
             type="text"
@@ -64,8 +96,6 @@ const BrowseProjects = () => {
             onChange={handleSearch}
             className="rounded-pill ps-4 pe-5 border-0 shadow-sm bg-light"
           />
-
-          {/* Clear (×) Button */}
           {searchTerm && (
             <button
               onClick={clearSearch}
@@ -76,45 +106,57 @@ const BrowseProjects = () => {
               <span className="fs-5 fw-bold">×</span>
             </button>
           )}
-
-          {/* Search Icon */}
-          <FaSearch
-            className="position-absolute top-50 translate-middle-y end-0 me-3 text-secondary opacity-75"
-          />
+          <FaSearch className="position-absolute top-50 translate-middle-y end-0 me-3 text-secondary opacity-75" />
         </Form.Group>
       </Form>
 
-      {loading && (
-        <div className="text-center my-5" aria-live="polite" aria-busy="true">
-          <Spinner animation="border" variant="primary" role="status" />
-          <div className="mt-2 text-primary fw-semibold">Loading projects...</div>
-        </div>
-      )}
+      <Row>
+        {/* Sidebar */}
+        <Col md={3} className="mb-4">
+          <div className="bg-white rounded shadow-sm p-3 sticky-top" style={{ top: "100px" }}>
+            <FilterSidebar
+              skillsList={[...new Set(projects.flatMap((p) => p.skillsRequired || []))]}
+              onFilterChange={applyFilters}
+            />
+          </div>
+        </Col>
 
-      {error && (
-        <UniversalAlert variant="error" show={showError} onClose={() => setShowError(false)}>
-          {error}
-        </UniversalAlert>
-      )}
-
-      {!loading && !error && filteredProjects.length === 0 && (
-        <div className="text-center d-flex flex-column align-items-center justify-content-center py-5">
-          <FaFolderOpen size={64} className="text-muted mb-3" />
-          <h5 className="fw-semibold text-muted">No projects found</h5>
-          <p className="text-secondary" style={{ maxWidth: "420px" }}>
-            We couldn't find any projects that match your search. Try different keywords or explore all available projects.
-          </p>
-        </div>
-      )}
-
-      <Row xs={1} md={2} lg={3} className="g-4">
-        {filteredProjects.map((project) => (
-          <Col key={project._id}>
-            <div className="shadow-sm rounded-4 h-100 p-2 bg-white border border-light-subtle">
-              <ProjectCard project={project} role={user?.role} />
+        {/* Main Project Content */}
+        <Col md={9}>
+          {loading && (
+            <div className="text-center my-5" aria-live="polite" aria-busy="true">
+              <Spinner animation="border" variant="primary" role="status" />
+              <div className="mt-2 text-primary fw-semibold">Loading projects...</div>
             </div>
-          </Col>
-        ))}
+          )}
+
+          {error && (
+            <UniversalAlert variant="error" show={showError} onClose={() => setShowError(false)}>
+              {error}
+            </UniversalAlert>
+          )}
+
+          {!loading && !error && filteredProjects.length === 0 && (
+            <div className="text-center d-flex flex-column align-items-center justify-content-center py-5">
+              <FaFolderOpen size={64} className="text-muted mb-3" />
+              <h5 className="fw-semibold text-muted">No projects found</h5>
+              <p className="text-secondary" style={{ maxWidth: "420px" }}>
+                We couldn't find any projects that match your search. Try different keywords or explore all available projects.
+              </p>
+            </div>
+          )}
+
+          {/* Projects Grid */}
+          <Row xs={1} sm={2} lg={2} xl={3} className="g-4">
+            {filteredProjects.map((project) => (
+              <Col key={project._id}>
+                <div className="shadow-sm rounded-4 h-100 p-3 bg-white border border-light-subtle">
+                  <ProjectCard project={project} role={user?.role} />
+                </div>
+              </Col>
+            ))}
+          </Row>
+        </Col>
       </Row>
     </Container>
   );
