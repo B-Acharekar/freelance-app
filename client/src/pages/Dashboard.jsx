@@ -1,8 +1,9 @@
-import { Container, Row, Col, Card, Badge } from "react-bootstrap";
+import { Container, Row, Col, Card, Badge, CloseButton } from "react-bootstrap";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getSystemAnnouncementForUser } from "../services/userService";
+import { getUserProfile } from "../services/userService";
 import {
   FaPlus,
   FaSearch,
@@ -16,8 +17,10 @@ import Notifications from "../components/Notifications";
 import PortfolioUploader from "../components/PortfolioUploader";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [announcement, setAnnouncement] = useState("");
+  const [showAnnouncement, setShowAnnouncement] = useState(true);
+  const [profile, setProfile] = useState([]);
 
   useEffect(() => {
     const fetchAnnouncement = async () => {
@@ -33,11 +36,41 @@ const Dashboard = () => {
     fetchAnnouncement();
   }, []);
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getUserProfile(token); // ✅ Pass the token
+        if (data) {
+          setProfile(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile", error);
+      }
+    };
+    fetchProfile();
+  }, [token]); // ✅ Optional: Add token as dependency
+
   return (
     <Container className="py-5">
+      {/* System Announcement */}
+      {announcement && showAnnouncement && (
+        <Card className="mb-5 shadow-sm border-0 rounded-4 bg-light position-relative">
+          <Card.Body className="d-flex align-items-start gap-3">
+            <FaBullhorn size={24} className="text-warning mt-1" />
+            <div>
+              <h5 className="text-dark fw-bold mb-1">System Announcement</h5>
+              <p className="mb-0 text-muted">{announcement}</p>
+            </div>
+            <CloseButton
+              onClick={() => setShowAnnouncement(false)}
+              className="position-absolute top-0 end-0 m-3"
+            />
+          </Card.Body>
+        </Card>
+      )}
       {/* Welcome Banner */}
       <Card className="mb-4 border-0 shadow-sm rounded-4 bg-gradient-lightblue">
-        <Card.Body className="d-flex justify-content-between align-items-center flex-wrap">
+        <Card.Body className="flex-column flex-md-row d-flex justify-content-between align-items-start flex-wrap">
           <div>
             <h2 className="fw-bold mb-1 text-primary">
               Welcome back, {user?.name || user?.email}
@@ -46,44 +79,33 @@ const Dashboard = () => {
               {user?.role}
             </Badge>
           </div>
-          <div className="text-end mt-3 mt-md-0">
+          <div className="mt-3 mt-md-0">
             <p className="mb-0 text-muted fs-6">
               Here’s a quick overview of your activity.
             </p>
             <div className="mt-3">
               {user?.role === "freelancer" && (
-                <>
-                  <p className="mb-1 text-muted fs-6">
-                    <strong>Funds:</strong> ${user?.funds}
-                  </p>
-                  <p className="mb-1 text-muted fs-6">
-                    <strong>Current Projects:</strong> {user?.currentProjects?.length}
-                  </p>
-                  <p className="mb-1 text-muted fs-6">
-                    <strong>Completed Projects:</strong> {user?.completedProjects?.length}
-                  </p>
-                  <p className="mb-1 text-muted fs-6">
-                    <strong>Applications:</strong> {user?.applications?.length}
-                  </p>
-                </>
+                <Row className="mt-3 mx-auto g-5">
+                  <Col md={3}>
+                    <StatCard title="Funds" value={`$${profile?.funds || 0}`} color="text-primary" />
+                  </Col>
+                  <Col md={3}>
+                    <StatCard title="Current Projects" value={profile?.currentProjects?.length || 0} color="text-success" />
+                  </Col>
+                  <Col md={3}>
+                    <StatCard title="Completed Projects" value={profile?.completedProjects?.length || 0} color="text-warning" />
+                  </Col>
+                  <Col md={3}>
+                    <StatCard title="Applications" value={profile?.applications?.length || 0} color="text-info" />
+                  </Col>
+                </Row>
+
               )}
+
             </div>
           </div>
         </Card.Body>
       </Card>
-
-      {/* System Announcement */}
-      {announcement && (
-        <Card className="mb-5 shadow-sm border-0 rounded-4 bg-light">
-          <Card.Body className="d-flex align-items-start gap-3">
-            <FaBullhorn size={24} className="text-warning mt-1" />
-            <div>
-              <h5 className="text-dark fw-bold mb-1">System Announcement</h5>
-              <p className="mb-0 text-muted">{announcement}</p>
-            </div>
-          </Card.Body>
-        </Card>
-      )}
 
       {/* Quick Actions Section */}
       <h4 className="fw-semibold mb-4 text-uppercase text-secondary">
@@ -195,6 +217,15 @@ const ActionCard = ({
       </Card.Body>
     </Card>
   </Col>
+);
+
+const StatCard = ({ title, value, color }) => (
+  <Card className="h-100 shadow-sm border-0 rounded-4 text-center bg-white">
+    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
+      <h6 className="text-muted text-uppercase mb-2">{title}</h6>
+      <h4 className={`fw-bold ${color}`}>{value}</h4>
+    </Card.Body>
+  </Card>
 );
 
 export default Dashboard;

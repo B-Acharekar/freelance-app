@@ -61,7 +61,7 @@ export const createApplication = async (req, res) => {
     freelancer.applications = freelancer.applications || [];
     freelancer.applications.push(application._id);
     await freelancer.save();
-
+    
     res.status(201).json({ message: "Application submitted", application });
   } catch (err) {
     console.error("Application creation error:", err);

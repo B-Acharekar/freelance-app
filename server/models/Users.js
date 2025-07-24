@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema(
     completedProjects: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Project" },
     ],
+    applications: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Applications" },
+    ],
     funds: { type: Number, default: 0 },
     isBlocked: { type: Boolean, default: false },
   },
