@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Container, Button, Form, Row, Col, Card, Spinner } from "react-bootstrap";
+import {
+  Container,
+  Button,
+  Form,
+  Row,
+  Col,
+  Card,
+  Spinner,
+  Badge,
+} from "react-bootstrap";
 import { getUserProfile, updateFreelancerProfile } from "../services/userService";
 import { useAuth } from "../context/AuthContext";
 
@@ -79,22 +88,32 @@ const Profile = () => {
 
   return (
     <Container className="mt-5">
-      <h2 className="mb-4">My Profile</h2>
-      <Card className="p-4 shadow-sm border-0 rounded-4">
-        <Row>
+      <h2 className="mb-3 fw-bold text-dark">My Profile</h2>
+
+      <Card className="p-4 mb-2 shadow-sm border-0 rounded-4 bg-white">
+        <Row className="mb-3">
           <Col md={6}>
+            <h5 className="mb-3 text-secondary">Account Details</h5>
             <p><strong>Name:</strong> {profile.name}</p>
             <p><strong>Email:</strong> {profile.email}</p>
+            <p>
+              <strong>Role:</strong>{" "}
+              <Badge bg={profile.role === "freelancer" ? "success" : "primary"} className="text-uppercase">
+                {profile.role}
+              </Badge>
+            </p>
           </Col>
 
           {role === "freelancer" && (
             <Col md={6}>
+              <h5 className="mb-3 text-secondary">Freelancer Information</h5>
+
               {!editing ? (
                 <>
-                  <p><strong>Skills:</strong> {profile.skills?.join(", ") || "Not set"}</p>
-                  <p><strong>Experience:</strong> {profile.experience || "Not set"}</p>
-                  <p><strong>Bio:</strong> {profile.bio || "Not set"}</p>
-                  <Button variant="outline-primary" onClick={() => setEditing(true)}>
+                  <p><strong>Skills:</strong> {profile.skills?.join(", ") || <em>Not provided</em>}</p>
+                  <p><strong>Experience:</strong> {profile.experience || <em>Not provided</em>}</p>
+                  <p><strong>Bio:</strong> {profile.bio || <em>Not provided</em>}</p>
+                  <Button variant="outline-dark" onClick={() => setEditing(true)}>
                     Edit Freelancer Info
                   </Button>
                 </>
@@ -134,7 +153,7 @@ const Profile = () => {
                     />
                   </Form.Group>
 
-                  <div className="d-flex gap-2">
+                  <div className="d-flex gap-2 mt-3">
                     <Button type="submit" variant="success">Save</Button>
                     <Button variant="secondary" onClick={() => setEditing(false)}>Cancel</Button>
                   </div>
