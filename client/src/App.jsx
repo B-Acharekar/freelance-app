@@ -23,6 +23,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import EditProject from "./pages/EditProject";
 import EditApplication from "./pages/EditApplication";
 import MyFreelanceProjects from "./pages/MyFreelanceProjects";
+import ToastProvider from "./components/ToastProvider";
+import ProjectChatView from "./pages/ProjectChatView";
 
 function App() {
   return (
@@ -30,6 +32,7 @@ function App() {
       <Router>
         <CustomNavbar />
         <FloatingBackButton />
+        <ToastProvider />
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Home />} />
@@ -141,6 +144,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["client", "freelancer"]}>
                 <ChatRoom />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/projects/:projectId/message/:receiverId"
+            element={
+              <ProtectedRoute allowedRoles={["client", "freelancer"]}>
+                <ProjectChatView />
               </ProtectedRoute>
             }
           />

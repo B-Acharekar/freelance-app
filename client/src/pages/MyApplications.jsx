@@ -9,17 +9,15 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { fetchMyApplications } from "../services/applicationService";
 import ApplicationCard from "../components/ApplicationCard";
-import UniversalAlert from "../components/UniversalAlert";
 import { FaSearch, FaFolderOpen } from "react-icons/fa";
+import { showToast } from "../components/toast";         
 
 export default function MyApplications() {
   const { token } = useAuth();
   const [applications, setApplications] = useState([]);
   const [filteredApps, setFilteredApps] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -30,9 +28,8 @@ export default function MyApplications() {
         setApplications(res.data);
         setFilteredApps(res.data);
       } catch (err) {
-        setError(err.response?.data?.message || err.message);
-        setShowError(true);
-      } finally {
+        const msg = err.response?.data?.message || err.message;
+        showToast("error", msg);                        
         setLoading(false);
       }
     };
@@ -56,10 +53,9 @@ export default function MyApplications() {
         return;
       }
 
-      const filtered = applications.filter((app) => {
-        const { projectTitle, projectDescription, coverLetter, skills = [] } = app;
-        const combined = `${projectTitle} ${projectDescription} ${coverLetter} ${skills.join(" ")}`.toLowerCase();
-        return combined.includes(lower);
+      const filtered = applications.filter(({ projectTitle, projectDescription, coverLetter, skills = [] }) => {
+        const text = `${projectTitle} ${projectDescription} ${coverLetter} ${skills.join(" ")}`.toLowerCase();
+        return text.includes(lower);
       });
 
       setFilteredApps(filtered);
@@ -82,6 +78,7 @@ export default function MyApplications() {
     const updated = applications.filter((app) => app._id !== deletedId);
     setApplications(updated);
     setFilteredApps(updated);
+    showToast("success", "Application deleted.");     
   };
 
   return (
@@ -115,15 +112,6 @@ export default function MyApplications() {
         </Form.Group>
       </Form>
 
-      {/* Error Alert */}
-      <UniversalAlert
-        variant="error"
-        show={showError}
-        onClose={() => setShowError(false)}
-      >
-        {error}
-      </UniversalAlert>
-
       {/* Loading Spinner */}
       {loading && (
         <div className="text-center my-5" aria-live="polite" aria-busy="true">
@@ -133,7 +121,7 @@ export default function MyApplications() {
       )}
 
       {/* No Results */}
-      {!loading && !error && filteredApps.length === 0 && (
+      {!loading && filteredApps.length === 0 && (
         <div className="text-center d-flex flex-column align-items-center justify-content-center py-5">
           <FaFolderOpen size={64} className="text-muted mb-3" />
           <h5 className="fw-semibold text-muted">No applications found</h5>

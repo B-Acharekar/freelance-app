@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import { registerUser } from "../services/auth";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "../components/toast";
 import { FaUserPlus, FaUserTie, FaUserGraduate } from "react-icons/fa";
 
 const Register = () => {
@@ -36,9 +37,11 @@ const Register = () => {
 
     try {
       await registerUser(form);
+      showToast("success", "Registration successful!")
       navigate("/login");
     } catch (err) {
       setError("Registration failed. Please try again.");
+      showToast("error", "Registration failed. Please check your details.");
     }
   };
 
@@ -220,6 +223,24 @@ const Register = () => {
                 Register
               </Button>
             </Form>
+            <div className="text-center mt-4 small">
+              <span className="text-muted">Already have an account?</span>{" "}
+              <a
+                role="button"
+                onClick={() => navigate("/login")}
+                style={{
+                  color: "#6a11cb",
+                  textDecoration: "underline",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "color 0.3s ease",
+                }}
+                onMouseEnter={(e) => (e.target.style.color = "#2575fc")}
+                onMouseLeave={(e) => (e.target.style.color = "#6a11cb")}
+              >
+                Login
+              </a>
+            </div>
           </div>
         </Col>
       </Row>

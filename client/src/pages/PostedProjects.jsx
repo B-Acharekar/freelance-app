@@ -16,7 +16,7 @@ import {
 import { FaComments, FaBriefcase, FaUserTie, FaPen, FaSearch } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import DeleteProjectButton from '../components/DeleteProjectButton';
-import UniversalAlert from '../components/UniversalAlert';
+import { showToast } from '../components/toast'; // ✅ NEW
 
 const PostedProjects = () => {
   const [postedProjects, setPostedProjects] = useState([]);
@@ -24,8 +24,6 @@ const PostedProjects = () => {
   const [applicationsMap, setApplicationsMap] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [showError, setShowError] = useState(false);
   const { token, user } = useAuth();
 
   useEffect(() => {
@@ -44,8 +42,7 @@ const PostedProjects = () => {
         setApplicationsMap(apps);
       } catch (err) {
         console.error('Failed to load posted projects or applications', err);
-        setError('Failed to load your posted projects. Please try again later.');
-        setShowError(true);
+        showToast("error", "Failed to load your posted projects. Please try again later."); // ✅
       } finally {
         setLoading(false);
       }
@@ -75,6 +72,7 @@ const PostedProjects = () => {
     const updated = postedProjects.filter((proj) => proj._id !== deletedId);
     setPostedProjects(updated);
     setFilteredProjects(updated);
+    showToast("success", "Project deleted successfully."); // ✅
   };
 
   if (!user || user.role !== 'client') {
@@ -114,14 +112,6 @@ const PostedProjects = () => {
           <FaSearch className="position-absolute top-50 translate-middle-y end-0 me-3 text-secondary opacity-75" />
         </Form.Group>
       </Form>
-
-      <UniversalAlert
-        variant="error"
-        show={showError}
-        onClose={() => setShowError(false)}
-      >
-        {error}
-      </UniversalAlert>
 
       {loading ? (
         <div className="text-center my-5" aria-busy="true">

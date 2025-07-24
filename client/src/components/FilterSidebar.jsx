@@ -1,6 +1,6 @@
-// components/FilterSidebar.jsx
 import { useState, useEffect } from "react";
 import { Form, Button, Badge } from "react-bootstrap";
+import { FaFilter } from "react-icons/fa";
 
 export default function FilterSidebar({ skillsList = [], onFilterChange }) {
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -27,18 +27,29 @@ export default function FilterSidebar({ skillsList = [], onFilterChange }) {
   };
 
   return (
-    <div className="p-3 border rounded bg-light shadow-sm">
-      <h5 className="mb-3 text-primary">Filter</h5>
+    <div className="p-4 border rounded-4 bg-white shadow-sm position-sticky top-0">
+      <div className="d-flex align-items-center mb-4">
+        <FaFilter className="me-2 text-dark" />
+        <h5 className="mb-0 fw-bold text-dark">Filter Projects</h5>
+      </div>
 
-      <Form.Group className="mb-3">
-        <Form.Label className="fw-bold">Skills</Form.Label>
+      {/* Skill Selection */}
+      <Form.Group className="mb-4">
+        <Form.Label className="fw-semibold text-secondary">Skills</Form.Label>
         <div className="d-flex flex-wrap gap-2">
           {skillsList.map((skill) => (
             <Badge
               key={skill}
-              bg={selectedSkills.includes(skill) ? "primary" : "secondary"}
+              bg={selectedSkills.includes(skill) ? "primary" : "light"}
+              text={selectedSkills.includes(skill) ? "light" : "dark"}
               pill
-              style={{ cursor: "pointer" }}
+              className="px-3 py-2 border"
+              style={{
+                cursor: "pointer",
+                fontSize: "0.85rem",
+                transition: "0.2s ease-in-out",
+                borderColor: selectedSkills.includes(skill) ? "#0d6efd" : "#dee2e6",
+              }}
               onClick={() => handleSkillToggle(skill)}
             >
               {skill}
@@ -47,8 +58,9 @@ export default function FilterSidebar({ skillsList = [], onFilterChange }) {
         </div>
       </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label className="fw-bold">Budget Range ($)</Form.Label>
+      {/* Budget Range */}
+      <Form.Group className="mb-4">
+        <Form.Label className="fw-semibold text-secondary">Budget Range (₹)</Form.Label>
         <div className="d-flex gap-2">
           <Form.Control
             type="number"
@@ -56,6 +68,7 @@ export default function FilterSidebar({ skillsList = [], onFilterChange }) {
             value={budgetRange.min}
             onChange={handleBudgetChange}
             placeholder="Min"
+            className="rounded-3"
           />
           <Form.Control
             type="number"
@@ -63,13 +76,22 @@ export default function FilterSidebar({ skillsList = [], onFilterChange }) {
             value={budgetRange.max}
             onChange={handleBudgetChange}
             placeholder="Max"
+            className="rounded-3"
           />
         </div>
       </Form.Group>
 
-      <Button variant="outline-secondary" size="sm" onClick={resetFilters}>
-        Reset Filters
-      </Button>
+      {/* Reset Button */}
+      <div className="d-grid">
+        <Button
+          variant="outline-secondary"
+          size="sm"
+          className="rounded-3 fw-medium"
+          onClick={resetFilters}
+        >
+          Reset Filters
+        </Button>
+      </div>
     </div>
   );
 }

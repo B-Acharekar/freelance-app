@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { Form, Button, Card, ProgressBar } from "react-bootstrap";
 import { FaUpload } from "react-icons/fa";
-import UniversalAlert from "./UniversalAlert";
 import { uploadFileToCloudinary } from "../services/uploadService";
+import { showToast } from "../components/toast"; // ✅ Update this path if needed
 
 const PortfolioUploader = ({ onUpload }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [alert, setAlert] = useState({ variant: "", message: "", show: false });
 
   const reset = () => {
     setFile(null);
@@ -23,18 +22,17 @@ const PortfolioUploader = ({ onUpload }) => {
   const handleUpload = async () => {
     if (!file) return;
     setUploading(true);
-    setAlert({ show: false });
 
     try {
       const res = await uploadFileToCloudinary(file, (evt) => {
         setProgress(Math.round((evt.loaded * 100) / evt.total));
       });
 
-      setAlert({ variant: "success", message: "Uploaded successfully", show: true });
-      onUpload(res.url); // ✅ FIXED: call correct prop
+      showToast("success", "File uploaded successfully!");
+      onUpload(res.url);
       reset();
-    } catch {
-      setAlert({ variant: "danger", message: "Upload failed. Try again.", show: true });
+    } catch (error) {
+      showToast("error", "Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -60,16 +58,6 @@ const PortfolioUploader = ({ onUpload }) => {
           animated
           striped
         />
-      )}
-
-      {alert.show && (
-        <UniversalAlert
-          variant={alert.variant}
-          show={alert.show}
-          onClose={() => setAlert({ show: false })}
-        >
-          {alert.message}
-        </UniversalAlert>
       )}
 
       <Button

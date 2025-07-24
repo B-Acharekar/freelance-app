@@ -2,16 +2,6 @@ import React from "react";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import {
-  FaUserCircle,
-  FaPlus,
-  FaSignOutAlt,
-  FaSignInAlt,
-  FaTasks,
-  FaThLarge,
-  FaProjectDiagram,
-  FaComments,
-} from "react-icons/fa";
 
 const CustomNavbar = () => {
   const { user, logout } = useAuth();
@@ -27,115 +17,70 @@ const CustomNavbar = () => {
         WebkitBackdropFilter: "blur(10px)",
       }}
     >
-      <Container fluid>
+      <Container fluid className="px-4">
         <Navbar.Brand
           as={Link}
           to={user ? (user.role === "admin" ? "/dashboard/admin" : "/dashboard") : "/"}
-          className="fw-bold fs-4 text-white d-flex align-items-center"
+          className="fw-bold fs-4 text-white"
           style={{ letterSpacing: "0.05em" }}
         >
-          <FaThLarge className="me-2" />
           SB Works
         </Navbar.Brand>
 
-        <Navbar.Toggle
-          aria-controls="navbar-nav"
-          className="bg-white border-0"
-          style={{ width: "3rem", height: "3rem" }}
-        />
+        <Navbar.Toggle aria-controls="navbar-nav" className="bg-white border-0" />
 
         <Navbar.Collapse id="navbar-nav" className="justify-content-end">
-          <Nav
-            className="align-items-center gap-3"
-            style={{ fontWeight: 600, letterSpacing: "0.02em" }}
-          >
+          <Nav className="align-items-center gap-3 fw-semibold">
+            {/* Client Links */}
             {user?.role === "client" && (
               <>
-                <Nav.Link
-                  as={NavLink}
-                  to="/projects/post"
-                  className="text-white d-flex align-items-center gap-1 nav-link-hover"
-                >
-                  <FaPlus />
+                <Nav.Link as={NavLink} to="/projects/post" className="text-white">
                   Post Project
                 </Nav.Link>
-                <Nav.Link
-                  as={NavLink}
-                  to="/my-projects"
-                  className="text-white d-flex align-items-center gap-1 nav-link-hover"
-                >
-                  <FaProjectDiagram />
+                <Nav.Link as={NavLink} to="/my-projects" className="text-white">
                   My Projects
                 </Nav.Link>
-                <Nav.Link
-                  as={NavLink}
-                  to="/projects/browse"
-                  className="text-white d-flex align-items-center gap-1 nav-link-hover"
-                >
-                  <FaTasks />
+                <Nav.Link as={NavLink} to="/projects/browse" className="text-white">
                   Browse Projects
+                </Nav.Link>
+                <Nav.Link as={NavLink} to="/chat" className="text-white">
+                  Messages
                 </Nav.Link>
               </>
             )}
 
+            {/* Freelancer Links */}
             {user?.role === "freelancer" && (
               <>
-                <Nav.Link
-                  as={NavLink}
-                  to="/projects/browse"
-                  className="text-white d-flex align-items-center gap-1 nav-link-hover"
-                >
-                  <FaTasks />
+                <Nav.Link as={NavLink} to="/projects/browse" className="text-white">
                   Browse Projects
                 </Nav.Link>
-                <Nav.Link
-                  as={NavLink}
-                  to="/applications/my"
-                  className="text-white d-flex align-items-center gap-1 nav-link-hover"
-                >
-                  <FaUserCircle />
+                <Nav.Link as={NavLink} to="/applications/my" className="text-white">
                   My Applications
                 </Nav.Link>
-
-                <Nav.Link
-                  as={NavLink}
-                  to="/projects/active"
-                  className="text-white d-flex align-items-center gap-1 nav-link-hover"
-                >
-                  <FaUserCircle />
-                  My work
+                <Nav.Link as={NavLink} to="/projects/active" className="text-white">
+                  My Work
                 </Nav.Link>
               </>
             )}
 
-            {user?.role === "client" && (
-              <Nav.Link
-                as={NavLink}
-                to="/chat"
-                className="text-white d-flex align-items-center gap-2 nav-link-hover"
-                style={{ fontWeight: 600 }}
-              >
-                <FaComments />
-                Messages
-              </Nav.Link>
-            )}
-
+            {/* Auth Links */}
             {!user ? (
               <>
-                <Nav.Link as={NavLink} to="/login" className="d-flex align-items-center">
+                <Nav.Link as={NavLink} to="/login">
                   <Button
                     variant="outline-light"
                     size="sm"
-                    className="d-flex align-items-center gap-2 shadow-sm fw-semibold rounded-pill px-3"
+                    className="rounded-pill px-3 fw-semibold shadow-sm"
                   >
-                    <FaSignInAlt /> Login
+                    Login
                   </Button>
                 </Nav.Link>
-                <Nav.Link as={NavLink} to="/register" className="d-flex align-items-center">
+                <Nav.Link as={NavLink} to="/register">
                   <Button
                     variant="outline-light"
                     size="sm"
-                    className="d-flex align-items-center gap-2 shadow-sm fw-semibold rounded-pill px-3"
+                    className="rounded-pill px-3 fw-semibold shadow-sm"
                   >
                     Register
                   </Button>
@@ -143,24 +88,18 @@ const CustomNavbar = () => {
               </>
             ) : (
               <>
-                {user && user.role !== "admin" && (
-                  <Nav.Link
-                    as={NavLink}
-                    to="/dashboard"
-                    className="text-white fw-semibold nav-link-hover"
-                    style={{ paddingTop: 6, paddingBottom: 6 }}
-                  >
+                {user.role !== "admin" && (
+                  <Nav.Link as={NavLink} to="/dashboard" className="text-white">
                     Dashboard
                   </Nav.Link>
                 )}
                 <Button
+                  onClick={logout}
                   variant="light"
                   size="sm"
-                  className="d-flex align-items-center gap-2 shadow-sm fw-semibold text-danger bg-white rounded-pill px-3"
-                  onClick={logout}
-                  style={{ whiteSpace: "nowrap" }}
+                  className="rounded-pill px-3 text-danger fw-semibold shadow-sm"
                 >
-                  <FaSignOutAlt /> Logout
+                  Logout
                 </Button>
               </>
             )}

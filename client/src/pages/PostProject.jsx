@@ -1,29 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../context/AuthContext";
 import ProjectForm from "../components/ProjectForm";
 import { Container, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
-import UniversalAlert from "../components/UniversalAlert";
 import { MdPostAdd } from "react-icons/md";
+import { showToast } from "../components/toast";
 
 const PostProject = () => {
   const { user } = useAuth();
-  const [success, setSuccess] = useState(false);
 
   if (!user || user.role !== "client") {
-    return (
-      <Container className="mt-5">
-        <UniversalAlert variant="error" show={true}>
-          Access Denied – Only clients can post projects.
-        </UniversalAlert>
-      </Container>
-    );
+    showToast("error", "Access Denied – Only clients can post projects.");
+    return null;
   }
 
   return (
-    <Container className="mt-5" style={{ maxWidth: "720px" }}>
-      <Card className="shadow-sm p-4 rounded-4 border-0">
+    <Container className="mt-5" style={{ maxWidth: "740px" }}>
+      <Card className="shadow p-4 rounded-4 border-0">
         <div className="d-flex align-items-center mb-4">
-          <MdPostAdd size={32} className="text-primary me-3" />
+          <MdPostAdd size={30} className="text-primary me-3" />
           <h2 className="mb-0 text-primary fw-bold">
             Post a New Project
           </h2>
@@ -31,7 +25,7 @@ const PostProject = () => {
             placement="right"
             overlay={
               <Tooltip id="tooltip-info">
-                Fill out the form carefully with all project details.
+                Please describe your project with required skills and budget.
               </Tooltip>
             }
           >
@@ -44,15 +38,11 @@ const PostProject = () => {
           </OverlayTrigger>
         </div>
 
-        <UniversalAlert
-          variant="success"
-          show={success}
-          onClose={() => setSuccess(false)}
-        >
-          Project posted successfully!
-        </UniversalAlert>
-
-        <ProjectForm onSuccess={() => setSuccess(true)} />
+        {/* Pass hideTitle */}
+        <ProjectForm
+          hideTitle={true}
+          onSuccess={() => showToast("success", "Project created successfully!")}
+        />
       </Card>
     </Container>
   );

@@ -6,7 +6,6 @@ import {
   Button,
   Spinner,
   Card,
-  Container,
 } from "react-bootstrap";
 import { Send } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContext";
@@ -21,7 +20,6 @@ const ChatBox = ({ receiverId, projectId }) => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // Join socket room
   useEffect(() => {
     if (!user || !projectId) return;
 
@@ -32,13 +30,9 @@ const ChatBox = ({ receiverId, projectId }) => {
     };
 
     socket.on("new-message", handleIncomingMessage);
-
-    return () => {
-      socket.off("new-message", handleIncomingMessage);
-    };
+    return () => socket.off("new-message", handleIncomingMessage);
   }, [user, projectId]);
 
-  // Fetch previous messages
   useEffect(() => {
     const loadMessages = async () => {
       try {
@@ -57,7 +51,6 @@ const ChatBox = ({ receiverId, projectId }) => {
     }
   }, [user, receiverId, projectId, token]);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -79,12 +72,8 @@ const ChatBox = ({ receiverId, projectId }) => {
   if (!user) return <p>Please log in to chat.</p>;
 
   return (
-    <Card className="shadow rounded-4 h-100 d-flex flex-column">
-      <Card.Header className="bg-primary text-white fw-semibold fs-5">
-        Project Chat
-      </Card.Header>
-
-      <Card.Body className="flex-grow-1 overflow-auto px-4 py-3" style={{ backgroundColor: "#f4f6f8" }}>
+    <Card className="shadow-sm border-0 rounded-bottom-4 rounded-top-0 h-100 d-flex flex-column overflow-hidden">
+      <Card.Body className="flex-grow-1 overflow-auto px-4 py-3" style={{ backgroundColor: "#f8f9fa" }}>
         {loading ? (
           <div className="text-center mt-4">
             <Spinner animation="border" variant="primary" />
@@ -100,15 +89,15 @@ const ChatBox = ({ receiverId, projectId }) => {
                 className={`d-flex mb-3 ${isSender ? "justify-content-end" : "justify-content-start"}`}
               >
                 <div
-                  className={`px-3 py-2 rounded-pill shadow-sm ${
-                    isSender ? "bg-primary text-white" : "bg-light"
+                  className={`px-3 py-2 rounded-4 position-relative shadow-sm ${
+                    isSender ? "bg-primary text-white" : "bg-white border"
                   }`}
-                  style={{ maxWidth: "70%" }}
+                  style={{ maxWidth: "75%", transition: "0.3s ease-in-out" }}
                 >
-                  <div>{msg.message}</div>
-                  <div className="text-end" style={{ fontSize: "0.75rem", opacity: 0.7 }}>
-                    {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString() : ""}
-                  </div>
+                  <div className="mb-1">{msg.message}</div>
+                  <small className={`d-block text-end ${isSender ? "text-white-50" : "text-muted"}`} style={{ fontSize: "0.75rem" }}>
+                    {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
+                  </small>
                 </div>
               </div>
             );
@@ -117,17 +106,22 @@ const ChatBox = ({ receiverId, projectId }) => {
         <div ref={messagesEndRef} />
       </Card.Body>
 
-      <Card.Footer className="p-3">
+      <Card.Footer className="border-top bg-white px-3 py-2">
         <InputGroup>
           <Form.Control
-            placeholder="Type a message..."
+            placeholder="Type your message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            className="rounded-pill"
+            className="rounded-pill px-4 border"
           />
-          <Button variant="primary" className="rounded-pill ms-2" onClick={handleSendMessage}>
-            <Send />
+          <Button
+            variant="primary"
+            className="rounded-circle d-flex align-items-center justify-content-center ms-2"
+            onClick={handleSendMessage}
+            style={{ width: "42px", height: "42px" }}
+          >
+            <Send fontSize="small" />
           </Button>
         </InputGroup>
       </Card.Footer>

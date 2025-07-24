@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://localhost:5000/api/users';
+const API_URL = "http://localhost:5000/api/users";
 
 export const getUserProfile = async (token) => {
   const res = await fetch(`${API_URL}/profile`, {
@@ -51,6 +51,15 @@ export const getFreelancerById = async (id, token) => {
   }
 
   return await res.json();
+};
+export const getUserProfileById = async (userId, token) => {
+  const response = await fetch(`/api/client/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) throw new Error("Failed to fetch client");
+  return response.json();
 };
 
 export const getSystemAnnouncementForUser = async () => {

@@ -6,14 +6,8 @@ import {
   updateApplicationStatus,
 } from "../services/applicationService";
 import ApplicationReviewCard from "../components/ApplicationReviewCard";
-import UniversalAlert from "../components/UniversalAlert";
-
-import {
-  Container,
-  Row,
-  Col,
-  Spinner,
-} from "react-bootstrap";
+import { showToast } from "../components/toast";
+import { Container, Row, Col, Spinner, Alert, Card } from "react-bootstrap";
 import { FaClipboardList } from "react-icons/fa";
 
 const ApplicationsByProject = () => {
@@ -22,9 +16,6 @@ const ApplicationsByProject = () => {
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const [variant, setVariant] = useState("success");
 
   useEffect(() => {
     if (!token || !projectId) return;
@@ -33,8 +24,13 @@ const ApplicationsByProject = () => {
       try {
         const res = await fetchApplicationsByProject(projectId, token);
         setApplications(res.data);
+        if (res.data.length === 0) {
+          showToast("info", "No applications found for this project.");
+        }
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch applications.");
+        const msg =
+          err.response?.data?.message || "Failed to fetch applications.";
+        showToast("error", msg);
       } finally {
         setLoading(false);
       }
@@ -51,61 +47,54 @@ const ApplicationsByProject = () => {
           app._id === applicationId ? { ...app, status: decision } : app
         )
       );
-      setVariant("success");
-      setMessage(`Application ${decision}ed successfully.`);
+      showToast("success", `Application ${decision}ed successfully.`);
     } catch (err) {
-      setVariant("error");
-      setMessage(err.response?.data?.message || `Failed to ${decision} application.`);
+      const msg =
+        err.response?.data?.message || `Failed to ${decision} application.`;
+      showToast("error", msg);
     }
   };
 
   if (!user || user.role !== "client") {
     return (
-      <Container className="mt-5">
-        <UniversalAlert variant="error" show={true}>
-          Access Denied – Only clients can view applications.
-        </UniversalAlert>
+      <Container className="py-5">
+        <Alert variant="danger">
+          <strong>Access Denied:</strong> Only clients can view applications.
+        </Alert>
       </Container>
     );
   }
 
   return (
-    <Container className="mt-5">
-      <div className="text-center mb-4">
-        <h2 className="fw-bold text-primary d-flex align-items-center justify-content-center gap-2">
-          <FaClipboardList /> Applications for This Project
-        </h2>
-        <p className="text-muted">Review and manage incoming proposals</p>
-      </div>
-
-      <UniversalAlert
-        variant={variant}
-        show={!!message}
-        onClose={() => setMessage("")}
-      >
-        {message}
-      </UniversalAlert>
+    <Container className="py-4">
+      <Card className="border-0 shadow-sm rounded-4 mb-4">
+        <Card.Body className="text-center">
+          <h3 className="fw-bold text-primary mb-2 d-flex justify-content-center align-items-center gap-2">
+            <FaClipboardList /> Applications Overview
+          </h3>
+          <p className="text-muted mb-0">
+            View and manage proposals submitted for this project
+          </p>
+        </Card.Body>
+      </Card>
 
       {loading ? (
         <div className="text-center py-5">
           <Spinner animation="border" variant="primary" />
+          <p className="mt-3 text-muted">Loading applications...</p>
         </div>
-      ) : error ? (
-        <UniversalAlert variant="error" show={true}>
-          {error}
-        </UniversalAlert>
       ) : applications.length === 0 ? (
-        <UniversalAlert variant="info" show={true}>
-          No applications found for this project.
-        </UniversalAlert>
+        <Alert variant="info" className="text-center rounded-4">
+          No applications received for this project yet.
+        </Alert>
       ) : (
-        <Row xs={1} md={2} className="g-4">
+        <Row xs={1} md={2} lg={2} className="g-4">
           {applications.map((app) => (
             <Col key={app._id}>
               <ApplicationReviewCard
                 app={app}
-                onAccept={(id) => handleDecision(id, 'accepted')}
-                onReject={(id) => handleDecision(id, 'rejected')}
+                onAccept={(id) => handleDecision(id, "accepted")}
+                onReject={(id) => handleDecision(id, "rejected")}
                 currentUserRole={user.role}
                 currentUserId={user._id}
               />

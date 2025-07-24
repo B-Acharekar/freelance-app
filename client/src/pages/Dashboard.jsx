@@ -54,28 +54,32 @@ const Dashboard = () => {
     <Container className="py-5">
       {/* System Announcement */}
       {announcement && showAnnouncement && (
-        <Card className="mb-5 shadow-sm border-0 rounded-4 bg-light position-relative">
-          <Card.Body className="d-flex align-items-start gap-3">
-            <FaBullhorn size={24} className="text-warning mt-1" />
-            <div>
-              <h5 className="text-dark fw-bold mb-1">System Announcement</h5>
-              <p className="mb-0 text-muted">{announcement}</p>
+        <Card className="mb-4 border-0 rounded-4 bg-white shadow-sm position-relative px-3 py-2">
+          <Card.Body className="d-flex align-items-start justify-content-between">
+            <div className="d-flex align-items-start gap-2">
+              <FaBullhorn size={20} className="text-warning mt-1" />
+              <div>
+                <div className="fw-semibold text-dark small">System Announcement</div>
+                <div className="text-muted small">{announcement}</div>
+              </div>
             </div>
             <CloseButton
+              variant="dark"
+              className="position-absolute top-0 end-0 m-2"
               onClick={() => setShowAnnouncement(false)}
-              className="position-absolute top-0 end-0 m-3"
             />
           </Card.Body>
         </Card>
       )}
+
       {/* Welcome Banner */}
       <Card className="mb-4 border-0 shadow-sm rounded-4 bg-gradient-lightblue">
         <Card.Body className="flex-column flex-md-row d-flex justify-content-between align-items-start flex-wrap">
           <div>
-            <h2 className="fw-bold mb-1 text-primary">
-              Welcome back, {user?.name || user?.email}
+            <h2 className="fw-bold mb-1 text-dark">
+              Welcome back, <span className="text-primary">{user?.name || user?.email}</span>
             </h2>
-            <Badge bg="dark" className="text-uppercase">
+            <Badge bg="info" className="text-uppercase">
               {user?.role}
             </Badge>
           </div>
@@ -87,7 +91,7 @@ const Dashboard = () => {
               {user?.role === "freelancer" && (
                 <Row className="mt-3 mx-auto g-5">
                   <Col md={3}>
-                    <StatCard title="Funds" value={`$${profile?.funds || 0}`} color="text-primary" />
+                    <StatCard title="Funds" value={`₹${profile?.funds || 0}`} color="text-primary" />
                   </Col>
                   <Col md={3}>
                     <StatCard title="Current Projects" value={profile?.currentProjects?.length || 0} color="text-success" />
@@ -191,6 +195,7 @@ const Dashboard = () => {
   );
 };
 
+// Reusable Components
 const ActionCard = ({
   title,
   text,
@@ -200,17 +205,18 @@ const ActionCard = ({
   link,
   textWhite,
 }) => (
-  <Col md={4}>
-    <Card className="h-100 shadow-sm border-0 rounded-4 card-hover bg-white">
-      <Card.Body className="d-flex flex-column">
-        <Card.Title className="fw-semibold d-flex align-items-center text-uppercase fs-5 mb-3">
-          {icon} {title}
-        </Card.Title>
-        <Card.Text className="text-muted flex-grow-1">{text}</Card.Text>
+  <Col md={6} lg={4}>
+    <Card className="h-100 border-0 shadow-sm rounded-4 bg-white position-relative transition" style={{ transition: 'transform 0.3s ease' }}>
+      <Card.Body className="d-flex flex-column justify-content-between">
+        <div className="mb-3">
+          <Card.Title className="d-flex align-items-center fw-semibold fs-5 mb-2 text-dark">
+            {icon} <span className="ms-2">{title}</span>
+          </Card.Title>
+          <Card.Text className="text-muted small">{text}</Card.Text>
+        </div>
         <Link
           to={link}
-          className={`btn btn-${btnVariant} w-100 mt-4 rounded-pill fw-semibold ${textWhite ? "text-white" : ""}`}
-          style={{ boxShadow: "0 4px 8px rgb(0 0 0 / 0.1)" }}
+          className={`btn btn-${btnVariant} w-100 rounded-pill fw-semibold ${textWhite ? "text-white" : ""}`}
         >
           {btnText}
         </Link>
@@ -220,10 +226,12 @@ const ActionCard = ({
 );
 
 const StatCard = ({ title, value, color }) => (
-  <Card className="h-100 shadow-sm border-0 rounded-4 text-center bg-white">
-    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
-      <h6 className="text-muted text-uppercase mb-2">{title}</h6>
-      <h4 className={`fw-bold ${color}`}>{value}</h4>
+  <Card className="h-100 shadow-sm border-0 rounded-4 bg-white text-center">
+    <Card.Body className="py-4">
+      <div className="mb-2">
+        <h6 className="text-uppercase text-muted small mb-1">{title}</h6>
+        <h3 className={`fw-bold ${color}`}>{value}</h3>
+      </div>
     </Card.Body>
   </Card>
 );

@@ -12,11 +12,13 @@ const DeleteApplicationButton = ({ applicationId, onDelete }) => {
     try {
       setDeleting(true);
       await deleteMyApplication(applicationId, token);
+      showToast("success", "Application deleted successfully.");
       setDeleting(false);
       setShow(false);
       if (onDelete) onDelete(applicationId);
     } catch (err) {
       console.error('Delete application failed', err);
+      showToast("error", "Failed to delete application.");
       setDeleting(false);
     }
   };

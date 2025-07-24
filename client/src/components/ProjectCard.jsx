@@ -7,26 +7,24 @@ const ProjectCard = ({ project, role }) => {
 
   return (
     <div
-      className="card shadow-sm border-0 rounded-4 mb-4 h-100"
-      style={{
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        cursor: 'default',
+      className="bg-white border border-light-subtle shadow-sm rounded-4 h-100 p-3"
+      style={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = '0 1rem 1.5rem rgba(0,0,0,0.08)';
       }}
-      onMouseEnter={e => {
-        e.currentTarget.style.transform = 'translateY(-6px)';
-        e.currentTarget.style.boxShadow = '0 1rem 1.5rem rgba(37,117,252,0.3)';
-      }}
-      onMouseLeave={e => {
+      onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.1)';
+        e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0,0,0,0.05)';
       }}
     >
-      <div className="card-body d-flex flex-column">
-        <h5 className="card-title fw-bold text-dark" style={{ minHeight: '3.5rem' }}>
-          {title}
-        </h5>
+      <div className="d-flex flex-column gap-3 h-100">
+        {/* Title */}
+        <h5 className="fw-bold text-dark mb-0">{title}</h5>
+
+        {/* Description */}
         <p
-          className="card-text text-muted flex-grow-1"
+          className="text-muted small mb-0"
           style={{
             display: '-webkit-box',
             WebkitLineClamp: 3,
@@ -39,60 +37,61 @@ const ProjectCard = ({ project, role }) => {
           {description}
         </p>
 
-        <ul className="list-unstyled mt-3 mb-3">
-          <li className="mb-2 d-flex align-items-center">
-            <FaMoneyBillWave className="me-2 text-success fs-5 flex-shrink-0" />
-            <strong>Budget:</strong> ₹{budget}
-          </li>
-          <li className="mb-3 d-flex align-items-center flex-wrap gap-2">
-            <FaTools className="me-2 text-primary fs-5 flex-shrink-0" />
-            <strong className="me-2">Skills:</strong>
-            {skillsRequired?.map((skill, idx) => (
+        {/* Budget */}
+        <div className="d-flex align-items-center gap-2 text-success small">
+          <FaMoneyBillWave />
+          <span className="fw-semibold">Budget: ₹{budget}</span>
+        </div>
+
+        {/* Skills */}
+        {skillsRequired?.length > 0 && (
+          <div className="d-flex flex-wrap align-items-center gap-2 mt-1">
+            <FaTools className="text-primary" />
+            <strong className="text-dark me-2 small">Skills:</strong>
+            {skillsRequired.map((skill, idx) => (
               <span
                 key={idx}
-                className="badge rounded-pill bg-primary bg-opacity-10 text-primary fw-semibold"
-                style={{ fontSize: '0.8rem' }}
-                title={skill}
+                className="badge bg-light text-primary border border-primary rounded-pill px-2 py-1"
+                style={{ fontSize: '0.72rem' }}
               >
                 {skill}
               </span>
             ))}
-          </li>
-          <li
-            className="text-muted small border-top pt-2 mt-3 d-flex align-items-center gap-2"
-            style={{ fontStyle: 'italic' }}
-            title={`${clientId?.name} (${clientId?.email})`}
-          >
-            <FaUserTie className="flex-shrink-0" />
-            <span>
-              Posted by: <strong>{clientId?.name}</strong> ({clientId?.email})
-            </span>
-          </li>
-        </ul>
+          </div>
+        )}
 
-        <div className="mt-auto d-flex gap-2 flex-wrap justify-content-end">
+        {/* Posted By */}
+        <div className="border-top pt-3 mt-2 text-muted d-flex align-items-center gap-2 small">
+          <FaUserTie className="text-secondary" />
+          <span>
+            <em>
+              Posted by <strong>{clientId?.name}</strong> ({clientId?.email})
+            </em>
+          </span>
+        </div>
+
+        {/* CTA */}
+        <div className="d-flex flex-wrap justify-content-end gap-2 pt-2 mt-auto">
           {role === 'freelancer' && (
             <>
               <NavLink
                 to={`/applications/apply/${_id}`}
-                className="btn btn-sm btn-outline-success rounded-pill px-4 py-2 fw-semibold shadow-sm"
+                className="btn btn-sm btn-outline-success rounded-pill fw-semibold px-3"
               >
                 Apply Now
               </NavLink>
-
               <NavLink
-                to={`/chatroom/${clientId?._id}/${_id}`}
-                className="btn btn-sm btn-outline-dark rounded-pill px-3 py-2 d-flex align-items-center gap-1 shadow-sm fw-semibold"
+                to={`/projects/${_id}/message/${clientId?._id}`}
+                className="btn btn-sm btn-outline-secondary rounded-pill d-flex align-items-center gap-2 fw-semibold px-3"
               >
-                <FaComments /> Message Client
+                <FaComments size={14} /> Message
               </NavLink>
             </>
           )}
-
           {role === 'client' && (
             <NavLink
               to={`/applications/project/${_id}`}
-              className="btn btn-sm btn-outline-primary rounded-pill px-4 py-2 fw-semibold shadow-sm"
+              className="btn btn-sm btn-outline-primary rounded-pill fw-semibold px-3"
             >
               View Applicants
             </NavLink>

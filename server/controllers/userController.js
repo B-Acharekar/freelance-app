@@ -39,6 +39,20 @@ export const getFreelancerById = async (req, res) => {
   }
 };
 
+export const getClientById = async (req, res) => {
+  try {
+    const client = await User.findById(req.params.id).select("-password");
+
+    if (!client || client.role !== "client") {
+      return res.status(404).json({ message: "client not found" });
+    }
+
+    res.json(client);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // PUT: Update freelancer profile
 export const updateFreelancerProfile = async (req, res) => {
   const { id } = req.params;

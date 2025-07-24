@@ -12,11 +12,13 @@ const DeleteProjectButton = ({ projectId, onDelete }) => {
     try {
       setDeleting(true);
       await deleteProject(projectId, token);
+      showToast("success", "Project deleted successfully.");
       setDeleting(false);
       setShow(false);
       if (onDelete) onDelete(projectId);
     } catch (err) {
       console.error('Delete failed', err);
+      showToast("error", "Failed to delete project.");
       setDeleting(false);
     }
   };
@@ -26,7 +28,7 @@ const DeleteProjectButton = ({ projectId, onDelete }) => {
       <Button
         variant="outline-danger"
         size="sm"
-        className="rounded-pill me-2"
+        className="hover:bg-danger rounded-pill me-2 hover:bg-red-600 text-red-600 hover:text-white"
         onClick={() => setShow(true)}
       >
         Delete
@@ -43,7 +45,7 @@ const DeleteProjectButton = ({ projectId, onDelete }) => {
           <Button variant="secondary" onClick={() => setShow(false)} disabled={deleting}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button variant="danger" onClick={handleDelete} disabled={deleting} className='hover:bg-danger'>
             {deleting ? <Spinner animation="border" size="sm" /> : 'Delete'}
           </Button>
         </Modal.Footer>

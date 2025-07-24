@@ -10,7 +10,6 @@ const ChatList = ({ onThreadSelect, selectedThread }) => {
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Deduplicate on the fly
   const deduplicateThreads = useMemo(() => {
     const seen = new Set();
     return threads.filter((item) => {
@@ -39,7 +38,7 @@ const ChatList = ({ onThreadSelect, selectedThread }) => {
   if (!user || user.role !== 'client') {
     return (
       <Container className="mt-5 d-flex justify-content-center">
-        <Card className="p-4 shadow-sm border-0 text-danger fw-semibold" style={{ maxWidth: 600 }}>
+        <Card className="p-4 shadow-sm border-0 text-danger fw-semibold bg-light rounded-4" style={{ maxWidth: 600 }}>
           Access denied — only clients can see chat threads.
         </Card>
       </Container>
@@ -55,16 +54,24 @@ const ChatList = ({ onThreadSelect, selectedThread }) => {
   }
 
   return (
-    <Container fluid className="py-3 px-0" style={{ minHeight: '100vh' }}>
-      <h4 className="text-primary fw-bold mb-3 px-4">
-        <FaComments className="me-2" />
-        Your Chat Threads
-      </h4>
+    <Container fluid className="pt-3 pb-5 px-2" style={{ minHeight: '100vh', backgroundColor: '#f9f9fb' }}>
+      <div className="d-flex align-items-center justify-content-between px-3 mb-4">
+        <h4 className="fw-bold text-dark mb-0">
+          <FaComments className="me-2 text-primary" />
+          Your Chat Threads
+        </h4>
+      </div>
 
       {deduplicateThreads.length === 0 ? (
-        <div className="px-4 text-muted">No active chats yet. Start messaging freelancers!</div>
+        <div className="px-4 text-muted fs-6">No active chats yet. Start messaging freelancers!</div>
       ) : (
-        <div style={{ maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' }}>
+        <div
+          style={{
+            maxHeight: 'calc(100vh - 120px)',
+            overflowY: 'auto',
+            paddingRight: '6px',
+          }}
+        >
           {deduplicateThreads.map((thread, idx) => {
             const isSelected =
               selectedThread?.otherUserId === thread.otherUserId &&
@@ -74,14 +81,17 @@ const ChatList = ({ onThreadSelect, selectedThread }) => {
               <div
                 key={idx}
                 onClick={() => onThreadSelect(thread)}
-                className={`mx-3 mb-3 rounded-4 p-3 transition cursor-pointer ${
+                className={`mb-3 mx-2 p-3 rounded-4 transition ${
                   isSelected
-                    ? 'bg-primary-subtle border border-primary text-primary shadow'
-                    : 'bg-white text-dark shadow-sm'
+                    ? 'bg-primary-subtle border border-primary text-primary shadow-sm'
+                    : 'bg-white text-dark shadow-sm border border-light'
                 }`}
                 style={{
-                  transition: 'all 0.3s ease',
                   cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: isSelected
+                    ? '0 0 0 2px rgba(13,110,253,0.2)'
+                    : '0 1px 2px rgba(0,0,0,0.05)',
                 }}
               >
                 <ChatThreadCard thread={thread} />

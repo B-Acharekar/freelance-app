@@ -6,7 +6,8 @@ import {
   updateFreelancerProfile,
   updateClientProfile,
   getFreelancers,
-  getFreelancerById
+  getFreelancerById,
+  getClientById
 } from '../controllers/userController.js';
 import { body } from "express-validator";
 import { validateRequest } from "../middlewares/validate.js";
@@ -29,5 +30,6 @@ router.put('/client', verifyToken, updateClientProfile);
 router.get('/announcement', getAnnouncement);
 router.get('/', verifyToken, getFreelancers); // All freelancers
 router.get('/freelancer/:id', verifyToken, getFreelancerById);
+router.get('/client/:id', verifyToken, getClientById);
 
 export default router;
