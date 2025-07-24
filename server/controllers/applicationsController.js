@@ -109,7 +109,7 @@ export const getMyApplications = async (req, res) => {
       bidAmount: app.bidAmount,
       coverLetter: app.coverLetter,
       portfolioLink: app.portfolioLink,
-      portfolioFile:app.portfolioFile,
+      portfolioFile: app.portfolioFile,
       status: app.status, // 👈 Include status
       createdAt: app.createdAt,
     }));
@@ -146,8 +146,20 @@ export const updateApplicationStatus = async (req, res) => {
 
     if (status === "accepted") {
       const freelancer = await User.findById(application.freelancerId);
+      if (!freelancer) {
+        return res.status(404).json({ message: "Freelancer not found" });
+      }
       const projectId = application.projectId._id;
+      const project = await Project.findById(projectId);
+      if (project.budget !== application.bidAmount) {
+        project.budget = application.bidAmount;
+        await project.save();
+      }
 
+      if (!project.assignedFreelancerId) {
+        project.assignedFreelancerId = application.freelancerId;
+        await project.save();
+      }
       // Only add if not already added
       if (!freelancer.currentProjects.includes(projectId)) {
         freelancer.currentProjects.push(projectId);

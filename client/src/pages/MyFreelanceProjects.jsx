@@ -16,6 +16,7 @@ const MyFreelanceProjects = () => {
         if (!token) return;
 
         try {
+            console.log("Fetching user....")
             setLoading(true);
             const user = await getUserProfile(token);
             const current = user.currentProjects || [];
@@ -39,9 +40,12 @@ const MyFreelanceProjects = () => {
     useEffect(() => {
         fetchUserProjects();
     }, [token]);
-
+    console.log("Token", token);
+    
     const handleComplete = async (projectId) => {
+        console.log("Running handleComplete....")
         setCompleting(projectId);
+        console.log("ProjectId:", projectId);
         try {
             await completeProject(projectId, token);
             alert("Project marked as complete.");

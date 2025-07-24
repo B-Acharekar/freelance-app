@@ -147,7 +147,7 @@ export const completeProject = async (req, res) => {
     project.status = "completed";
     await project.save();
 
-    const freelancer = await User.findById(project.assignedFreelancer);
+    const freelancer = await User.findById(project.assignedFreelancerId);
     if (!freelancer) {
       return res.status(404).json({ message: "Freelancer not found" });
     }

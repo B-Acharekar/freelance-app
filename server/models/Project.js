@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema({
   title: {
@@ -19,13 +19,17 @@ const projectSchema = new mongoose.Schema({
   },
   clientId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
+  },
+  assignedFreelancerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   },
   status: {
     type: String,
-    enum: ['open', 'in progress', 'completed'],
-    default: 'open',
+    enum: ["open", "in progress", "completed"],
+    default: "open",
   },
   createdAt: {
     type: Date,
@@ -33,5 +37,5 @@ const projectSchema = new mongoose.Schema({
   },
 });
 
-const Project = mongoose.model('Project', projectSchema);
+const Project = mongoose.model("Project", projectSchema);
 export default Project;
