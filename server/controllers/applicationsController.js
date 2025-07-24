@@ -5,7 +5,13 @@ import User from "../models/Users.js";
 
 export const createApplication = async (req, res) => {
   try {
-    const { coverLetter, bidAmount, portfolioLink, portfolioFile, estimatedTime } = req.body;
+    const {
+      coverLetter,
+      bidAmount,
+      portfolioLink,
+      portfolioFile,
+      estimatedTime,
+    } = req.body;
     const projectId = req.params.projectId;
 
     const freelancer = await User.findById(req.user.id);
@@ -47,7 +53,6 @@ export const createApplication = async (req, res) => {
       portfolioLink,
       portfolioFile,
     });
-
     await application.save();
 
     // Update project with bid data
@@ -59,8 +64,10 @@ export const createApplication = async (req, res) => {
 
     // Update freelancer's application list
     freelancer.applications = freelancer.applications || [];
-    freelancer.applications.push(application._id);
-    await freelancer.save();
+    if (!freelancer.applications.includes(application._id)) {
+      freelancer.applications.push(application._id);
+      await freelancer.save(); // Save updated freelancer document
+    }
     
     res.status(201).json({ message: "Application submitted", application });
   } catch (err) {
@@ -160,6 +167,7 @@ export const updateApplicationStatus = async (req, res) => {
         project.assignedFreelancerId = application.freelancerId;
         await project.save();
       }
+
       // Only add if not already added
       if (!freelancer.currentProjects.includes(projectId)) {
         freelancer.currentProjects.push(projectId);
@@ -180,7 +188,8 @@ export const updateApplication = async (req, res) => {
     const { coverLetter, bidAmount, portfolioLink, portfolioFile } = req.body;
 
     const application = await Application.findById(id);
-    if (!application) return res.status(404).json({ message: "Application not found" });
+    if (!application)
+      return res.status(404).json({ message: "Application not found" });
 
     if (application.freelancerId.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized" });
@@ -203,7 +212,8 @@ export const deleteApplication = async (req, res) => {
     const { id } = req.params;
 
     const application = await Application.findById(id);
-    if (!application) return res.status(404).json({ message: "Application not found" });
+    if (!application)
+      return res.status(404).json({ message: "Application not found" });
 
     if (application.freelancerId.toString() !== req.user.id) {
       return res.status(403).json({ message: "Unauthorized" });
@@ -220,8 +230,12 @@ export const getApplicationById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const application = await Application.findById(id).populate("projectId", "title description");
-    if (!application) return res.status(404).json({ message: "Application not found" });
+    const application = await Application.findById(id).populate(
+      "projectId",
+      "title description"
+    );
+    if (!application)
+      return res.status(404).json({ message: "Application not found" });
 
     // Check if current user is the freelancer who created it
     if (application.freelancerId.toString() !== req.user.id) {
