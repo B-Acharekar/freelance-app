@@ -1,0 +1,23 @@
+# Ignore node_modules at all levels
+**/node_modules/
+
+# Ignore lock files at root
+/package-lock.json
+/yarn.lock
+/pnpm-lock.yaml
+
+# Prevent root-level package files from being tracked
+/package.json
+
+# Allow package files inside client/ and server/
+!/client/package.json
+!/server/package.json
+!/client/package-lock.json
+!/server/package-lock.json
+
+# Logs
+*.log
+
+# Optional OS-specific ignores
+.DS_Store
+Thumbs.db
