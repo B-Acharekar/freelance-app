@@ -83,15 +83,6 @@ const ChatPage = () => {
             </Card>
           ) : (
             <Card className="h-100 rounded-4 shadow-sm border-0 d-flex align-items-center justify-content-center text-muted fs-5">
-              <Card.Header className="bg-white border-bottom rounded-top-4 px-4 py-3 d-flex align-items-center justify-content-between shadow-sm">
-                <div className="d-flex align-items-center gap-2">
-                  <FaComments className="text-primary fs-5" />
-                  <h5 className="mb-0 fw-semibold text-dark">Project Chat</h5>
-                </div>
-                <span className="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill">
-                  Live
-                </span>
-              </Card.Header>
               <Card.Body className="d-flex align-items-center justify-content-center flex-column">
                 <FaComments className="mb-2" size={32} />
                 Select a chat to start messaging

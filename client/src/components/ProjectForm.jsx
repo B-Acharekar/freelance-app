@@ -17,9 +17,11 @@ import {
   FaTools,
 } from "react-icons/fa";
 import { showToast } from "../components/toast";
+import { useNavigate } from "react-router-dom";
 
-const ProjectForm = ({ onSuccess,hideTitle, initialData = null, projectId = null }) => {
+const ProjectForm = ({hideTitle, initialData = null, projectId = null }) => {
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -58,11 +60,11 @@ const ProjectForm = ({ onSuccess,hideTitle, initialData = null, projectId = null
       if (projectId) {
         await updateProject(projectId, body, token);
         showToast("success", "Project updated successfully!");
+        navigate("/dashboard");
       } else {
         await createProject(body, token);
         showToast("success", "Project posted successfully!");
       }
-      onSuccess?.();
     } catch (error) {
       showToast("error", "Failed to submit project. Please try again.");
       console.error("Project submission error:", error);

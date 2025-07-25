@@ -128,7 +128,7 @@ const BrowseProjects = () => {
             <div className="text-center py-5">
               <FaFolderOpen size={64} className="text-muted mb-3" />
               <h5 className="fw-semibold text-muted">No projects found</h5>
-              <p className="text-secondary" style={{ maxWidth: "420px" }}>
+              <p className="mx-auto text-secondary" style={{ maxWidth: "420px" }}>
                 Try changing filters or search terms to find more projects.
               </p>
             </div>

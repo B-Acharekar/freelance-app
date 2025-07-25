@@ -133,10 +133,10 @@ const Profile = () => {
                   <Form.Group className="mb-3" controlId="experience">
                     <Form.Label>Experience</Form.Label>
                     <Form.Control
-                      type="text"
+                      type="number"
                       name="experience"
                       value={formData.experience}
-                      placeholder="e.g. 3 years in full-stack development"
+                      placeholder="e.g. 3"
                       onChange={handleChange}
                     />
                   </Form.Group>

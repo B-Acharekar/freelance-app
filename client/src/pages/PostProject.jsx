@@ -14,7 +14,7 @@ const PostProject = () => {
   }
 
   return (
-    <Container className="mt-5" style={{ maxWidth: "740px" }}>
+    <Container className="my-5" style={{ maxWidth: "740px" }}>
       <Card className="shadow p-4 rounded-4 border-0">
         <div className="d-flex align-items-center mb-4">
           <MdPostAdd size={30} className="text-primary me-3" />
@@ -41,7 +41,6 @@ const PostProject = () => {
         {/* Pass hideTitle */}
         <ProjectForm
           hideTitle={true}
-          onSuccess={() => showToast("success", "Project created successfully!")}
         />
       </Card>
     </Container>
