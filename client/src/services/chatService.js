@@ -1,7 +1,7 @@
 // src/services/chatService.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/chat';
+const API_URL = 'https://freelance-api-lwu9.onrender.com/api/chat';
 
 export const sendMessage = async (data, token) => {
   if (!token) throw new Error('No auth token provided');

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/users";
+const API_URL = "https://freelance-api-lwu9.onrender.com/api/users";
 
 export const getUserProfile = async (token) => {
   const res = await fetch(`${API_URL}/profile`, {

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/admin",
+  baseURL: "https://freelance-api-lwu9.onrender.com/api/admin",
 });
 
 // Attach token dynamically before every request

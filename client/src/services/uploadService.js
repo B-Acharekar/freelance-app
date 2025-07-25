@@ -1,7 +1,7 @@
 // src/services/uploadService.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://freelance-api-lwu9.onrender.com/api';
 
 export const uploadFileToCloudinary = async (file, onProgress) => {
   const formData = new FormData();
