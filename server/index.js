@@ -18,10 +18,15 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:5173",
+];
+
+
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Your frontend URL
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -34,7 +39,7 @@ io.on("connection", (socket) => {
 
 app.set("io", io);
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
