@@ -1,7 +1,7 @@
 // src/services/uploadService.js
 import axios from 'axios';
 
-const API_URL = `${REACT_APP_API_URL}/api`;
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export const uploadFileToCloudinary = async (file, onProgress) => {
   const formData = new FormData();

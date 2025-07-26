@@ -1,7 +1,7 @@
 // src/services/chatService.js
 import axios from 'axios';
 
-const API_URL = `${REACT_APP_API_URL}/api/chat`;
+const API_URL = `${import.meta.env.VITE_API_URL}/api/chat`;
 
 export const sendMessage = async (data, token) => {
   if (!token) throw new Error('No auth token provided');
