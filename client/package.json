@@ -2,7 +2,7 @@
   "name": "client",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://B-Acharekar.github.io/freelance-app",
+  "homepage": "https://b-acharekar.github.io/freelance-app",
   "type": "module",
   "scripts": {
     "dev": "vite",
